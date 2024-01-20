@@ -20,6 +20,7 @@
 */
 
 #include "BaseTraceViewModel.h"
+#include "qtooltip.h"
 
 #include <QDateTime>
 #include <QColor>
@@ -28,6 +29,7 @@
 #include <core/CanTrace.h>
 #include <core/CanMessage.h>
 #include <core/CanDbMessage.h>
+#include<iostream>
 
 BaseTraceViewModel::BaseTraceViewModel(Backend &backend)
 {
@@ -52,6 +54,8 @@ QVariant BaseTraceViewModel::headerData(int section, Qt::Orientation orientation
                     return QString("Channel");
                 case column_direction:
                     return QString("Rx/Tx");
+                case column_type:
+                    return QString("Type");
                 case column_canid:
                     return QString("CAN ID");
                 case column_sender:
@@ -74,6 +78,8 @@ QVariant BaseTraceViewModel::headerData(int section, Qt::Orientation orientation
 
 QVariant BaseTraceViewModel::data(const QModelIndex &index, int role) const
 {
+    int row = index.row();
+    int col = index.column();
     switch (role) {
         case Qt::DisplayRole:
             return data_DisplayRole(index, role);
@@ -81,6 +87,9 @@ QVariant BaseTraceViewModel::data(const QModelIndex &index, int role) const
             return data_TextAlignmentRole(index, role);
         case Qt::TextColorRole:
             return data_TextColorRole(index, role);
+        case Qt::ToolTipRole:
+            return index.data(Qt::DisplayRole).toString();
+            //return QString("Row%1, Column%2").arg(row + 1).arg(col +1);
         default:
             return QVariant();
     }
@@ -155,6 +164,12 @@ QVariant BaseTraceViewModel::data_DisplayRole_Message(const QModelIndex &index, 
 
         case column_direction:
             return "rx";
+
+        case column_type:
+        {
+            QString _type = QString(currentMsg.isFD()? "Fd.":"") + QString(currentMsg.isExtended()? "Ext." : "Std.") + QString(currentMsg.isRTR()?"RTR":"") + QString((currentMsg.isBRS()?"BRS":""));
+            return _type;
+        }
 
         case column_canid:
             return currentMsg.getIdString();
@@ -236,6 +251,7 @@ QVariant BaseTraceViewModel::data_TextAlignmentRole(const QModelIndex &index, in
         case column_timestamp: return Qt::AlignRight + Qt::AlignVCenter;
         case column_channel: return Qt::AlignCenter + Qt::AlignVCenter;
         case column_direction: return Qt::AlignCenter + Qt::AlignVCenter;
+        case column_type: return Qt::AlignCenter + Qt::AlignVCenter;
         case column_canid: return Qt::AlignRight + Qt::AlignVCenter;
         case column_sender: return Qt::AlignLeft + Qt::AlignVCenter;
         case column_name: return Qt::AlignLeft + Qt::AlignVCenter;
@@ -269,3 +285,4 @@ QVariant BaseTraceViewModel::data_TextColorRole_Signal(const QModelIndex &index,
         return QVariant::fromValue(QColor(200,200,200));
     }
 }
+

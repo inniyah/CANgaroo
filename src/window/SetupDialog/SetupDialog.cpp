@@ -40,7 +40,8 @@ SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SetupDialog),
     _backend(&backend),
-    _currentNetwork(0)
+    _currentNetwork(0),
+    _isReflashNetworks(false)
 {
     ui->setupUi(this);
 
@@ -82,7 +83,7 @@ SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
     connect(ui->interfacesTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(updateButtons()));
 
     connect(ui->btReloadDatabases, SIGNAL (released()), this, SLOT(executeReloadCanDbs()));
-    connect(ui->btRefreshNetworks, SIGNAL(released()), this, SLOT(on_btRefreshNetwork_clicked()));
+    connect(ui->btRefreshNetworks, SIGNAL(released()), this, SLOT(on_btRefreshNetworks_clicked()));
 
     connect(_actionAddCanDb, SIGNAL(triggered()), this, SLOT(executeAddCanDb()));
     connect(_actionDeleteCanDb, SIGNAL(triggered()), this, SLOT(executeDeleteCanDb()));
@@ -112,6 +113,8 @@ void SetupDialog::displayPage(QWidget *widget)
 
 bool SetupDialog::showSetupDialog(MeasurementSetup &setup)
 {
+    _isReflashNetworks = false;
+
     model->load(setup);
     ui->treeView->expandAll();
 
@@ -169,8 +172,6 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
             default:
                 ui->stackedWidget->setCurrentWidget(ui->emptyPage);
                 break;
-
-
         }
     }
 
@@ -336,5 +337,11 @@ void SetupDialog::on_btRefreshNetworks_clicked()
 {
     _backend->setDefaultSetup();
     showSetupDialog(_backend->getSetup());
+    _isReflashNetworks = true;
+}
+
+bool SetupDialog::isReflashNetworks()
+{
+    return _isReflashNetworks;
 }
 

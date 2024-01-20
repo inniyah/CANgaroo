@@ -49,9 +49,9 @@ void GenericCanSetupPage::onShowInterfacePage(SetupDialog &dlg, MeasurementInter
     ui->laInterfaceDetails->setText(intf->getDetailsStr());
 
     fillBitratesList(intf, _mi->bitrate());
-    fillFdBitrate(intf, _mi->bitrate());
+    fillFdBitrate(intf, _mi->fdBitrate());
     fillSamplePointsForBitrate(intf, _mi->bitrate(), _mi->samplePoint());
-
+    fillSamplePointsForFdBitrate(intf,_mi->fdBitrate(),_mi->fdSamplePoint());
 
     ui->cbConfigOS->setChecked(!_mi->doConfigure());
     ui->cbListenOnly->setChecked(_mi->isListenOnlyMode());
@@ -77,6 +77,8 @@ void GenericCanSetupPage::updateUI()
         _mi->setAutoRestart(ui->cbAutoRestart->isChecked());
         _mi->setBitrate(ui->cbBitrate->currentData().toUInt());
         _mi->setSamplePoint(ui->cbSamplePoint->currentData().toUInt());
+        _mi->setFdBitrate(ui->cbBitrateFD->currentData().toUInt());
+        _mi->setFdSamplePoint(ui->cbSamplePointFD->currentData().toUInt());
 
         _enable_ui_updates = false;
 
@@ -86,11 +88,13 @@ void GenericCanSetupPage::updateUI()
             ui->cbBitrate->currentData().toUInt(),
             ui->cbSamplePoint->currentData().toUInt()
         );
+        fillSamplePointsForFdBitrate(
+            intf,
+            ui->cbBitrateFD->currentData().toUInt(),
+            ui->cbSamplePointFD->currentData().toUInt()
+        );
         _enable_ui_updates = true;
-
     }
-
-
 }
 
 void GenericCanSetupPage::fillBitratesList(CanInterface *intf, unsigned selectedBitrate)
@@ -134,7 +138,8 @@ void GenericCanSetupPage::fillFdBitrate(CanInterface *intf, unsigned selectedBit
 {
     QList<uint32_t> fdBitrates;
     foreach(CanTiming t, intf->getAvailableBitrates()) {
-        if (t.getBitrate() == selectedBitrate) {
+        if (1) {
+        //if (t.getBitrate() == selectedBitrate) {
             if (t.isCanFD() && !fdBitrates.contains(t.getBitrateFD())) {
                 fdBitrates.append(t.getBitrateFD());
             }
@@ -146,6 +151,26 @@ void GenericCanSetupPage::fillFdBitrate(CanInterface *intf, unsigned selectedBit
     foreach (uint32_t fd_br, fdBitrates) {
         ui->cbBitrateFD->addItem(QString::number(fd_br), fd_br);
     }
+    ui->cbBitrateFD->setCurrentText(QString::number(selectedBitrate));
+}
+
+void GenericCanSetupPage::fillSamplePointsForFdBitrate(CanInterface *intf, unsigned selectedBitrate, unsigned selectedSamplePoint)
+{
+    QList<uint32_t> samplePoints;
+    foreach(CanTiming t, intf->getAvailableBitrates()) {
+        if (t.getBitrateFD() == selectedBitrate) {
+            if (!samplePoints.contains(t.getSamplePointFD())) {
+                samplePoints.append(t.getSamplePointFD());
+            }
+        }
+    }
+    qSort(samplePoints);
+
+    ui->cbSamplePointFD->clear();
+    foreach (uint32_t sp, samplePoints) {
+        ui->cbSamplePointFD->addItem(CanTiming::getSamplePointFDStr(sp), sp);
+    }
+    ui->cbSamplePointFD->setCurrentText(CanTiming::getSamplePointFDStr(selectedSamplePoint));
 }
 
 void GenericCanSetupPage::disenableUI(bool enabled)

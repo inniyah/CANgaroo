@@ -58,8 +58,8 @@ public slots:
     QMainWindow *createGraphWindow(QString title=QString());
     void addGraphWidget(QMainWindow *parent=0);
     void addRawTxWidget(QMainWindow *parent=0);
-    void addLogWidget(QMainWindow *parent=0);
-    void addStatusWidget(QMainWindow *parent=0);
+    QDockWidget *addLogWidget(QMainWindow *parent=0);
+    QDockWidget *addStatusWidget(QMainWindow *parent=0);
 
     bool showSetupDialog();
     void showAboutDialog();

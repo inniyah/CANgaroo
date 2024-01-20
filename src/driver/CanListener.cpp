@@ -28,6 +28,8 @@
 #include <core/CanMessage.h>
 #include "CanInterface.h"
 
+#include <QMessageBox>
+
 CanListener::CanListener(QObject *parent, Backend &backend, CanInterface &intf)
   : QObject(parent),
     _backend(backend),
@@ -63,10 +65,22 @@ void CanListener::run()
     _openComplete = true;
     while (_shouldBeRunning) {
         if (_intf.readMessage(rxMessages, 1000)) {
-            for(CanMessage msg: rxMessages)
+            for(const CanMessage &msg: qAsConst(rxMessages))
             {
                 trace->enqueueMessage(msg, false);
             }
+            rxMessages.clear();
+        }
+        else if(_intf.isOpen() == false)
+        {
+            qRegisterMetaType<log_level_t >("log_level_t");
+            log_error(QString("Error on interface: %1, Closed!!!").arg(_intf.getName()));
+            rxMessages.clear();
+            break;
+
+        }
+        else
+        {
             rxMessages.clear();
         }
     }

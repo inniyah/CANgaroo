@@ -109,6 +109,7 @@ private:
 
     int _idx;
     bool _isOpen;
+    bool _isOffline;
     QSerialPort* _serport;
     QStringList _msg_queue;
     QMutex _serport_mutex;
@@ -130,4 +131,5 @@ private:
     bool updateStatus();
     bool parseMessage(CanMessage &msg);
 
+    void handleSerialError(QSerialPort::SerialPortError error);
 };

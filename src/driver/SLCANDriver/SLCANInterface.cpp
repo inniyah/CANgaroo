@@ -40,6 +40,7 @@ SLCANInterface::SLCANInterface(SLCANDriver *driver, int index, QString name, boo
   : CanInterface((CanDriver *)driver),
 	_idx(index),
     _isOpen(false),
+    _isOffline(false),
     _serport(NULL),
     _msg_queue(),
     _name(name),
@@ -53,6 +54,19 @@ SLCANInterface::SLCANInterface(SLCANDriver *driver, int index, QString name, boo
     _settings.setSamplePoint(875);
 
     _config.supports_canfd = fd_support;
+    if(fd_support)
+    {
+        _settings.setFdBitrate(2000000);
+        _settings.setFdSamplePoint(750);
+    }
+
+    _status.can_state = state_bus_off;
+    _status.rx_count = 0;
+    _status.rx_errors = 0;
+    _status.rx_overruns = 0;
+    _status.tx_count = 0;
+    _status.tx_errors = 0;
+    _status.tx_dropped = 0;
 }
 
 SLCANInterface::~SLCANInterface() {
@@ -81,15 +95,18 @@ QList<CanTiming> SLCANInterface::getAvailableBitrates()
 {
     QList<CanTiming> retval;
     QList<unsigned> bitrates({10000, 20000, 50000, 83333, 100000, 125000, 250000, 500000, 800000, 1000000});
-    QList<unsigned> bitrates_fd({0, 2000000, 5000000});
+    QList<unsigned> bitrates_fd({1000000, 2000000, 3000000, 4000000, 5000000});
 
     QList<unsigned> samplePoints({875});
+    QList<unsigned> samplePoints_fd({750});
 
     unsigned i=0;
     foreach (unsigned br, bitrates) {
         foreach(unsigned br_fd, bitrates_fd) {
             foreach (unsigned sp, samplePoints) {
-                retval << CanTiming(i++, br, br_fd, sp);
+                foreach (unsigned sp_fd, samplePoints_fd) {
+                    retval << CanTiming(i++, br, br_fd, sp,sp_fd);
+                }
             }
         }
     }
@@ -164,10 +181,7 @@ bool SLCANInterface::updateStatistics()
 
 uint32_t SLCANInterface::getState()
 {
-    if(_isOpen)
-        return state_ok;
-    else
-        return state_bus_off;
+    return _status.can_state;
 }
 
 int SLCANInterface::getNumRxFrames()
@@ -221,6 +235,10 @@ void SLCANInterface::open()
     _serport->setStopBits(QSerialPort::OneStop);
     _serport->setFlowControl(QSerialPort::NoFlowControl);
     _serport->setReadBufferSize(2048);
+
+    qRegisterMetaType<QSerialPort::SerialPortError>("SerialThread");
+    connect(_serport, static_cast<void (QSerialPort::*)(QSerialPort::SerialPortError)>(&QSerialPort::error),  this, &SLCANInterface::handleSerialError);
+
     if (_serport->open(QIODevice::ReadWrite)) {
         //perror("Serport connected!");
     } else {
@@ -284,15 +302,25 @@ void SLCANInterface::open()
 
     _serport->waitForBytesWritten(300);
 
-
-
     // Set configured BRS rate
     if(_config.supports_canfd)
     {
         switch(_settings.fdBitrate())
         {
+            case 1000000:
+                _serport->write("Y1\r", 3);
+                _serport->flush();
+                break;
             case 2000000:
                 _serport->write("Y2\r", 3);
+                _serport->flush();
+                break;
+            case 3000000:
+                _serport->write("Y3\r", 3);
+                _serport->flush();
+                break;
+            case 4000000:
+                _serport->write("Y4\r", 3);
                 _serport->flush();
                 break;
             case 5000000:
@@ -306,13 +334,32 @@ void SLCANInterface::open()
 
 
     // Open the port
-    _serport->write("O\r\n", 3);
+    _serport->write("O\r", 3);
     _serport->flush();
 
+    _msg_queue.clear();
+
     _isOpen = true;
+    _isOffline = false;
+    _status.can_state = state_ok;
+    _status.rx_count = 0;
+    _status.rx_errors = 0;
+    _status.rx_overruns = 0;
+    _status.tx_count = 0;
+    _status.tx_errors = 0;
+    _status.tx_dropped = 0;
 
     // Release port mutex
     _serport_mutex.unlock();
+}
+
+void SLCANInterface::handleSerialError(QSerialPort::SerialPortError error)
+{
+    if (error == QSerialPort::ResourceError) {
+        perror("error");
+
+        _isOffline = true;
+    }
 }
 
 void SLCANInterface::close()
@@ -330,6 +377,7 @@ void SLCANInterface::close()
     }
 
     _isOpen = false;
+    _status.can_state = state_bus_off;
     _serport_mutex.unlock();
 }
 
@@ -467,6 +515,13 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
     // Don't saturate the thread. Read the buffer every 1ms.
     QThread().msleep(1);
 
+    if(_isOffline == true)
+    {
+        if(_isOpen)
+            close();
+        return false;
+    }
+
     // Transmit all items that are queued
     while(!_msg_queue.empty())
     {
@@ -476,7 +531,14 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
 
         _serport_mutex.lock();
         // Write string to serial device
-        _serport->write(tmp.toStdString().c_str(), tmp.length());
+        if(_serport->write(tmp.toStdString().c_str(), tmp.length())==tmp.length())
+        {
+            _status.tx_count ++;
+        }
+        else
+        {
+            _status.tx_errors ++;
+        }
         _serport->flush();
         _serport->waitForBytesWritten(300);
         _serport_mutex.unlock();
@@ -489,6 +551,7 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
     {
         // This is called when readyRead() is emitted
         QByteArray datas = _serport->readAll();
+
         _rxbuf_mutex.lock();
         for(int i=0; i<datas.count(); i++)
         {
@@ -508,11 +571,9 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
         _rxbuf_mutex.unlock();
     }
 
-
-
     //////////////////////////
 
-    bool ret = false;
+    bool ret = true;
     _rxbuf_mutex.lock();
     while(_rxbuf_tail != _rxbuf_head)
     {
@@ -528,6 +589,10 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
                 ret = parseMessage(msg);
                 msglist.append(msg);
                 _rx_linbuf_ctr = 0;
+                if(ret == true)
+                {
+                    _status.rx_count ++;
+                }
             }
         }
         // Discard data if not
@@ -555,8 +620,9 @@ bool SLCANInterface::parseMessage(CanMessage &msg)
     msg.setErrorFrame(0);
     msg.setInterfaceId(getId());
     msg.setId(0);
-
-    bool msg_is_fd = false;
+    msg.setRTR(false);
+    msg.setFD(false);
+    msg.setBRS(false);
 
     // Convert from ASCII (2nd character to end)
     for (int i = 1; i < _rx_linbuf_ctr; i++)
@@ -572,54 +638,75 @@ bool SLCANInterface::parseMessage(CanMessage &msg)
             _rx_linbuf[i] = _rx_linbuf[i] - '0';
     }
 
+    bool is_extended = false;
+    bool is_rtr = false;
 
     // Handle each incoming command
     switch(_rx_linbuf[0])
     {
-
         // Transmit data frame command
-        case 'T':
-            msg.setExtended(1);
-            break;
         case 't':
-            msg.setExtended(0);
-            break;
+        {
+            is_extended = false;
+        }
+        break;
+        case 'T':
+        {
+            is_extended = true;
+        }
+        break;
 
         // Transmit remote frame command
         case 'r':
-            msg.setExtended(0);
-            msg.setRTR(1);
-            break;
+        {
+            is_extended = false;
+            is_rtr = true;
+        }
+        break;
         case 'R':
-            msg.setExtended(1);
-            msg.setRTR(1);
-            break;
+        {
+            is_extended = true;
+            is_rtr = true;
+        }
+        break;
 
         // CANFD transmit - no BRS
         case 'd':
-            msg.setExtended(0);
-            msg_is_fd = true;
-            break;
+        {
+            is_extended = false;
+            msg.setFD(true);
+            msg.setBRS(false);
+        }
+        break;
         case 'D':
-            msg.setExtended(1);
-            msg_is_fd = true;
-            break;
+        {
+            is_extended = true;
+            msg.setFD(true);
+            msg.setBRS(false);
+        }
+        break;
 
         // CANFD transmit - with BRS
         case 'b':
-            msg.setExtended(0);
-            msg_is_fd = true;
-            break;
+        {
+            is_extended = false;
+            msg.setFD(true);
+            msg.setBRS(true);
+        }
+        break;
         case 'B':
-            msg.setExtended(1);
-            msg_is_fd = true;
-            break;
-
-
+        {
+            is_extended = true;
+            msg.setFD(true);
+            msg.setBRS(true);
+        }
+        break;
 
         // Invalid command
         default:
+        {
             return false;
+        }
     }
 
     // Start parsing at second byte (skip command byte)
@@ -629,7 +716,7 @@ bool SLCANInterface::parseMessage(CanMessage &msg)
     uint8_t id_len = SLCAN_STD_ID_LEN;
 
     // Update length if message is extended ID
-    if(msg.isExtended())
+    if(is_extended)
         id_len = SLCAN_EXT_ID_LEN;
 
     uint32_t id_tmp = 0;
@@ -637,22 +724,23 @@ bool SLCANInterface::parseMessage(CanMessage &msg)
     // Iterate through ID bytes
     while(parse_loc <= id_len)
     {
-        id_tmp *= 16;
+        id_tmp <<= 4;
         id_tmp += _rx_linbuf[parse_loc++];
     }
 
-
     msg.setId(id_tmp);
+    msg.setExtended(is_extended);
+    msg.setRTR(is_rtr);
 
     // Attempt to parse DLC and check sanity
     uint8_t dlc_code_raw = _rx_linbuf[parse_loc++];
 
     // If dlc is too long for an FD frame
-    if(msg_is_fd && dlc_code_raw > 0xF)
+    if(msg.isFD() && dlc_code_raw > 0xF)
     {
         return false;
     }
-    if(!msg_is_fd && dlc_code_raw > 0x8)
+    if(!msg.isFD() && dlc_code_raw > 0x8)
     {
         return false;
     }

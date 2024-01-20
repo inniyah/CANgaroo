@@ -41,7 +41,7 @@ CanStatusWindow::CanStatusWindow(QWidget *parent, Backend &backend) :
         << "Driver" << "Interface" << "State"
         << "Rx Frames" << "Rx Errors" << "Rx Overrun"
         << "Tx Frames" << "Tx Errors" << "Tx Dropped"
-        << "# Warning" << "# Passive" << "# Bus Off" << " #Restarts"
+        // << "# Warning" << "# Passive" << "# Bus Off" << " #Restarts"
     );
     ui->treeWidget->setColumnWidth(0, 80);
     ui->treeWidget->setColumnWidth(1, 70);
@@ -81,6 +81,7 @@ void CanStatusWindow::beginMeasurement()
 
 void CanStatusWindow::endMeasurement()
 {
+    update();
     _timer->stop();
 }
 

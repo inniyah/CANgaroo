@@ -1,4 +1,5 @@
 #include "TraceFilterModel.h"
+#include "BaseTraceViewModel.h"
 
 TraceFilterModel::TraceFilterModel(QObject *parent)
     : QSortFilterProxyModel{parent},
@@ -19,10 +20,10 @@ bool TraceFilterModel::filterAcceptsRow(int source_row, const QModelIndex & sour
     if(_filterText.length() == 0)
         return true;
 
-    QModelIndex idx0 = sourceModel()->index(source_row, 1, source_parent); // Channel
-    QModelIndex idx1 = sourceModel()->index(source_row, 3, source_parent); // CAN ID
-    QModelIndex idx2 = sourceModel()->index(source_row, 4, source_parent); // Sender
-    QModelIndex idx3 = sourceModel()->index(source_row, 5, source_parent); // Name
+    QModelIndex idx0 = sourceModel()->index(source_row, BaseTraceViewModel::column_channel, source_parent); // Channel
+    QModelIndex idx1 = sourceModel()->index(source_row, BaseTraceViewModel::column_canid, source_parent); // CAN ID
+    QModelIndex idx2 = sourceModel()->index(source_row, BaseTraceViewModel::column_sender, source_parent); // Sender
+    QModelIndex idx3 = sourceModel()->index(source_row, BaseTraceViewModel::column_name, source_parent); // Name
 
     QString datastr0 = sourceModel()->data(idx0).toString();
     QString datastr1 = sourceModel()->data(idx1).toString();

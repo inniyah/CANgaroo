@@ -27,11 +27,13 @@
 #include "LinearTraceViewModel.h"
 #include "AggregatedTraceViewModel.h"
 #include "TraceFilterModel.h"
+#include <core/Backend.h>
 
 TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     ConfigurableWidget(parent),
     ui(new Ui::TraceWindow),
-    _backend(&backend)
+    _backend(&backend),
+    _doAutoScroll(false)
 {
     ui->setupUi(this);
 
@@ -50,8 +52,6 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     _linFilteredModel = new TraceFilterModel(this);
     _linFilteredModel->setSourceModel(_linearProxyModel);
 
-
-
     setMode(mode_aggregated);
     setAutoScroll(false);
 
@@ -61,14 +61,16 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     ui->tree->setAlternatingRowColors(true);
 
     ui->tree->setUniformRowHeights(true);
-    ui->tree->setColumnWidth(0, 120);
-    ui->tree->setColumnWidth(1, 70);
-    ui->tree->setColumnWidth(2, 50);
-    ui->tree->setColumnWidth(3, 90);
-    ui->tree->setColumnWidth(4, 200);
-    ui->tree->setColumnWidth(5, 200);
-    ui->tree->setColumnWidth(6, 50);
-    ui->tree->setColumnWidth(7, 200);
+    ui->tree->setColumnWidth(BaseTraceViewModel::column_timestamp, 120);
+    ui->tree->setColumnWidth(BaseTraceViewModel::column_channel, 70);
+    ui->tree->setColumnWidth(BaseTraceViewModel::column_direction, 50);
+    ui->tree->setColumnWidth(BaseTraceViewModel::column_type, 80);
+    ui->tree->setColumnWidth(BaseTraceViewModel::column_canid, 80);
+    ui->tree->setColumnWidth(BaseTraceViewModel::column_sender, 150);
+    ui->tree->setColumnWidth(BaseTraceViewModel::column_name, 150);
+    ui->tree->setColumnWidth(BaseTraceViewModel::column_dlc, 50);
+    ui->tree->setColumnWidth(BaseTraceViewModel::column_data, 300);
+    ui->tree->setColumnWidth(BaseTraceViewModel::column_comment, 90);
     ui->tree->sortByColumn(BaseTraceViewModel::column_canid, Qt::AscendingOrder);
 
     ui->cbTimestampMode->addItem("absolute", 0);
@@ -79,6 +81,8 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     connect(_linearTraceViewModel, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(rowsInserted(QModelIndex,int,int)));
 
     connect(ui->filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(on_cbFilterChanged()));
+
+    connect(ui->TraceClearpushButton, SIGNAL(released()), this, SLOT(on_cbTraceClearpushButton()));
 }
 
 TraceWindow::~TraceWindow()
@@ -214,4 +218,10 @@ void TraceWindow::on_cbFilterChanged()
     _linFilteredModel->setFilterText(ui->filterLineEdit->text());
     _aggFilteredModel->invalidate();
     _linFilteredModel->invalidate();
+}
+
+void TraceWindow::on_cbTraceClearpushButton()
+{
+    _backend->clearTrace();
+    _backend->clearLog();
 }

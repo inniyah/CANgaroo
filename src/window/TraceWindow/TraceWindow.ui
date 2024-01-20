@@ -54,6 +54,9 @@
         <property name="text">
          <string>auto scroll</string>
         </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
        </widget>
       </item>
       <item>
@@ -70,14 +73,31 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="label_2">
+       <widget class="QPushButton" name="TraceClearpushButton">
         <property name="text">
-         <string>Filter: </string>
+         <string>Clear</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="filterLineEdit"/>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>CAN ID Filter: </string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="filterLineEdit">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string>CAN ID(hex)</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

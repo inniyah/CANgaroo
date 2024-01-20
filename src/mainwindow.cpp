@@ -80,7 +80,7 @@ MainWindow::MainWindow(QWidget *parent) :
     Backend::instance().addCanDriver(*(new CandleApiDriver(Backend::instance())));
 #endif
     Backend::instance().addCanDriver(*(new SLCANDriver(Backend::instance())));
-    Backend::instance().addCanDriver(*(new CANBlasterDriver(Backend::instance())));
+    // Backend::instance().addCanDriver(*(new CANBlasterDriver(Backend::instance())));
 
     setWorkspaceModified(false);
     newWorkspace();
@@ -98,7 +98,9 @@ void MainWindow::updateMeasurementActions()
 {
     bool running = backend().isMeasurementRunning();
     ui->actionStart_Measurement->setEnabled(!running);
+    ui->actionSetup->setEnabled(!running);
     ui->actionStop_Measurement->setEnabled(running);
+
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -137,6 +139,7 @@ void MainWindow::stopAndClearMeasurement()
     QCoreApplication::processEvents();
     backend().clearTrace();
     backend().clearLog();
+
 }
 
 void MainWindow::clearWorkspace()
@@ -350,7 +353,7 @@ QMainWindow *MainWindow::createTraceWindow(QString title)
     }
     QMainWindow *mm = createTab(title);
     mm->setCentralWidget(new TraceWindow(mm, backend()));
-    addLogWidget(mm);
+    mm->tabifyDockWidget(addStatusWidget(mm),addLogWidget(mm));
 
     ui->mainTabs->setCurrentWidget(mm);
     return mm;
@@ -389,7 +392,7 @@ void MainWindow::addRawTxWidget(QMainWindow *parent)
 }
 
 
-void MainWindow::addLogWidget(QMainWindow *parent)
+QDockWidget *MainWindow::addLogWidget(QMainWindow *parent)
 {
     if (!parent) {
         parent = currentTab();
@@ -397,9 +400,10 @@ void MainWindow::addLogWidget(QMainWindow *parent)
     QDockWidget *dock = new QDockWidget("Log", parent);
     dock->setWidget(new LogWindow(dock, backend()));
     parent->addDockWidget(Qt::BottomDockWidgetArea, dock);
+    return dock;
 }
 
-void MainWindow::addStatusWidget(QMainWindow *parent)
+QDockWidget *MainWindow::addStatusWidget(QMainWindow *parent)
 {
     if (!parent) {
         parent = currentTab();
@@ -408,6 +412,7 @@ void MainWindow::addStatusWidget(QMainWindow *parent)
     QDockWidget *dock = new QDockWidget("CAN Status", parent);
     dock->setWidget(new CanStatusWindow(dock, backend()));
     parent->addDockWidget(Qt::BottomDockWidgetArea, dock);
+    return dock;
 }
 
 void MainWindow::on_actionCan_Status_View_triggered()
@@ -419,9 +424,18 @@ bool MainWindow::showSetupDialog()
 {
     MeasurementSetup new_setup(&backend());
     new_setup.cloneFrom(backend().getSetup());
-
-    if (_setupDlg->showSetupDialog(new_setup)) {
+    backend().setDefaultSetup();
+    if(backend().getSetup().countNetworks() == new_setup.countNetworks())
+    {
         backend().setSetup(new_setup);
+    }
+    else
+    {
+        new_setup.cloneFrom(backend().getSetup());
+    }
+    if (_setupDlg->showSetupDialog(new_setup)) {
+        if(!_setupDlg->isReflashNetworks())
+            backend().setSetup(new_setup);
         setWorkspaceModified(true);
         return true;
     } else {
@@ -436,10 +450,11 @@ void MainWindow::showAboutDialog()
        "cangaroo\n"
        "open source can bus analyzer\n"
        "\n"
-       "version 0.2.3\n"
+       "version 0.2.4\n"
        "\n"
        "(c)2015-2017 Hubert Denkmair\n"
-       "(c)2018-2022 Ethan Zonca"
+       "(c)2018-2022 Ethan Zonca\n"
+       "(c)2024 WeAct Studio"
     );
 }
 
@@ -481,10 +496,7 @@ void MainWindow::saveTraceToFile()
         } else {
             // TODO error message
         }
-
-
     }
-
 }
 
 

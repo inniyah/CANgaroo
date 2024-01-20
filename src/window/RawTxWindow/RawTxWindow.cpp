@@ -539,6 +539,11 @@ void RawTxWindow::sendRawMessage()
         msg.setFD(true);
 
     CanInterface *intf = _backend.getInterfaceById((CanInterfaceId)ui->comboBoxInterface->currentData().toUInt());
+    if(!intf->isOpen())
+    {
+        log_error(intf->getName() + " not Open!");
+        return;
+    }
     intf->sendMessage(msg);
 
 

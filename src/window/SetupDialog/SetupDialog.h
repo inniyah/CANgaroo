@@ -47,6 +47,7 @@ public:
     bool showSetupDialog(MeasurementSetup &setup);
     void addPage(QWidget *widget);
     void displayPage(QWidget *widget);
+    bool isReflashNetworks();
 
 signals:
     void onShowInterfacePage(SetupDialog &dlg, MeasurementInterface *mi);
@@ -81,6 +82,7 @@ private slots:
 private:
     Ui::SetupDialog *ui;
     Backend *_backend;
+    bool _isReflashNetworks;
 
     QAction *_actionDeleteInterface;
     QAction *_actionDeleteCanDb;

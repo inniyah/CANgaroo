@@ -33,7 +33,7 @@ enum {
 };
 
 CanMessage::CanMessage()
-  : _raw_id(0), _dlc(0), _isFD(false), _interface(0), _u8()
+    : _raw_id(0), _dlc(0), _isFD(false), _isBRS(false), _interface(0), _u8()
 {
     _timestamp.tv_sec = 0;
     _timestamp.tv_usec = 0;
@@ -41,7 +41,7 @@ CanMessage::CanMessage()
 }
 
 CanMessage::CanMessage(uint32_t can_id)
-  : _dlc(0), _interface(0), _u8()
+    : _dlc(0), _isFD(false), _isBRS(false), _interface(0), _u8()
 {
     _timestamp.tv_sec = 0;
     _timestamp.tv_usec = 0;
@@ -57,6 +57,8 @@ void CanMessage::cloneFrom(const CanMessage &msg)
 {
     _raw_id = msg._raw_id;
     _dlc = msg._dlc;
+    _isFD = msg._isFD;
+    _isBRS = msg._isBRS;
 
     // Copy data
     for(int i=0; i<64; i++)

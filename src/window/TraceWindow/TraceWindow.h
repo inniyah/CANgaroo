@@ -28,13 +28,13 @@
 namespace Ui {
 class TraceWindow;
 }
-
+class Backend;
 class QDomDocument;
 class QDomElement;
 class QSortFilterProxyModel;
 class LinearTraceViewModel;
 class AggregatedTraceViewModel;
-class Backend;
+
 
 class TraceWindow : public ConfigurableWidget
 {
@@ -65,6 +65,8 @@ private slots:
 
     void on_cbTimestampMode_currentIndexChanged(int index);
     void on_cbFilterChanged(void);
+
+    void on_cbTraceClearpushButton(void);
 
 private:
     Ui::TraceWindow *ui;

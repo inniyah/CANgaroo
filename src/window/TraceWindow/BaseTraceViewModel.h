@@ -38,6 +38,7 @@ public:
         column_timestamp,
         column_channel,
         column_direction,
+        column_type,
         column_canid,
         column_sender,
         column_name,

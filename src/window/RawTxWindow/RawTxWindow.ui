@@ -80,7 +80,16 @@
     <string>hhhhhhhh</string>
    </property>
    <property name="text">
-    <string>000</string>
+    <string notr="true">000</string>
+   </property>
+   <property name="frame">
+    <bool>true</bool>
+   </property>
+   <property name="cursorPosition">
+    <number>8</number>
+   </property>
+   <property name="cursorMoveStyle">
+    <enum>Qt::LogicalMoveStyle</enum>
    </property>
   </widget>
   <widget class="QLabel" name="label">
@@ -88,12 +97,12 @@
     <rect>
      <x>10</x>
      <y>50</y>
-     <width>71</width>
+     <width>81</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>Address</string>
+    <string>Address(hex)</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
