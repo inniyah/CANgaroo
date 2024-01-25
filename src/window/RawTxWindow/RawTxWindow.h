@@ -52,11 +52,16 @@ private slots:
     void refreshInterfaces();
     void sendRawMessage();
 
+    void fieldAddress_textChanged(QString str);
+
+    void sendstate_timer_timeout();
+
 
 private:
     Ui::RawTxWindow *ui;
     Backend &_backend;
     QTimer *repeatmsg_timer;
+    QTimer *sendstate_timer;
     void hideFDFields();
     void showFDFields();
 

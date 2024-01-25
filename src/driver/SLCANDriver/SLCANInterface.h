@@ -22,13 +22,14 @@
 #pragma once
 
 #include "../CanInterface.h"
+#include "qdatetime.h"
 #include <core/MeasurementInterface.h>
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QMutex>
 
 // Maximum rx buffer len
-#define SLCAN_MTU 138 + 1 + 16 // canfd 64 frame plus \r plus some padding
+#define SLCAN_MTU (1 + 8 + 1 + 128 + 1) // canfd 64 frame plus \r plus some padding
 #define SLCAN_STD_ID_LEN 3
 #define SLCAN_EXT_ID_LEN 8
 
@@ -60,7 +61,12 @@ typedef struct {
 
 class SLCANInterface: public CanInterface {
 public:
-    SLCANInterface(SLCANDriver *driver, int index, QString name, bool fd_support);
+    enum {
+        CANable,
+        WeActStudio,
+    };
+public:
+    SLCANInterface(SLCANDriver *driver, int index, QString name, bool fd_support, uint32_t manufacturer);
     virtual ~SLCANInterface();
 
     QString getDetailsStr() const;
@@ -79,7 +85,6 @@ public:
 
     virtual unsigned getBitrate();
     virtual uint32_t getCapabilities();
-
 
 	virtual void open();
     virtual void close();
@@ -107,6 +112,7 @@ private:
         ts_mode_SIOCGSTAMP
     } ts_mode_t;
 
+    uint32_t _manufacturer;
     int _idx;
     bool _isOpen;
     bool _isOffline;
@@ -114,7 +120,7 @@ private:
     QStringList _msg_queue;
     QMutex _serport_mutex;
     QString _name;
-    char _rx_linbuf[SLCAN_MTU];
+    char _rx_linbuf[SLCAN_MTU+1];
     int _rx_linbuf_ctr;
 
     char _rxbuf[RXCIRBUF_LEN];
@@ -127,6 +133,9 @@ private:
     can_config_t _config;
     can_status_t _status;
     ts_mode_t _ts_mode;
+
+    QDateTime  _readMessage_datetime;
+    uint32_t _send_wait_respond;
 
     bool updateStatus();
     bool parseMessage(CanMessage &msg);

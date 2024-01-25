@@ -35,10 +35,12 @@
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QThread>
+#include <iostream>
 
-SLCANInterface::SLCANInterface(SLCANDriver *driver, int index, QString name, bool fd_support)
+SLCANInterface::SLCANInterface(SLCANDriver *driver, int index, QString name, bool fd_support, uint32_t manufacturer)
   : CanInterface((CanDriver *)driver),
-	_idx(index),
+    _manufacturer(manufacturer),
+    _idx(index),
     _isOpen(false),
     _isOffline(false),
     _serport(NULL),
@@ -47,13 +49,16 @@ SLCANInterface::SLCANInterface(SLCANDriver *driver, int index, QString name, boo
     _rx_linbuf_ctr(0),
     _rxbuf_head(0),
     _rxbuf_tail(0),
-    _ts_mode(ts_mode_SIOCSHWTSTAMP)
+    _ts_mode(ts_mode_SIOCSHWTSTAMP),
+    _send_wait_respond(0)
 {
     // Set defaults
     _settings.setBitrate(500000);
     _settings.setSamplePoint(875);
 
     _config.supports_canfd = fd_support;
+    _config.supports_timing = false;
+
     if(fd_support)
     {
         _settings.setFdBitrate(2000000);
@@ -67,19 +72,35 @@ SLCANInterface::SLCANInterface(SLCANDriver *driver, int index, QString name, boo
     _status.tx_count = 0;
     _status.tx_errors = 0;
     _status.tx_dropped = 0;
+
+    _readMessage_datetime = QDateTime::currentDateTime();
 }
 
 SLCANInterface::~SLCANInterface() {
 }
 
 QString SLCANInterface::getDetailsStr() const {
-    if(_config.supports_canfd)
+    if(_manufacturer == CANable)
     {
-        return "CANable with CANFD support";
+        if(_config.supports_canfd)
+        {
+            return "CANable with CANFD support";
+        }
+        else
+        {
+            return "CANable with standard CAN support";
+        }
     }
-    else
+    else if(_manufacturer == WeActStudio)
     {
-        return "CANable with standard CAN support";
+        if(_config.supports_canfd)
+        {
+            return "WeAct Studio USB2CAN with CANFD support";
+        }
+        else
+        {
+            return "WeAct Studio USB2CAN with standard CAN support";
+        }
     }
 }
 
@@ -94,11 +115,26 @@ void SLCANInterface::setName(QString name) {
 QList<CanTiming> SLCANInterface::getAvailableBitrates()
 {
     QList<CanTiming> retval;
-    QList<unsigned> bitrates({10000, 20000, 50000, 83333, 100000, 125000, 250000, 500000, 800000, 1000000});
-    QList<unsigned> bitrates_fd({1000000, 2000000, 3000000, 4000000, 5000000});
+    QList<unsigned> bitrates;
+    QList<unsigned> bitrates_fd;
 
-    QList<unsigned> samplePoints({875});
-    QList<unsigned> samplePoints_fd({750});
+    QList<unsigned> samplePoints;
+    QList<unsigned> samplePoints_fd;
+
+    if(_manufacturer == CANable)
+    {
+        bitrates.append({10000, 20000, 50000, 83333, 100000, 125000, 250000, 500000, 800000, 1000000});
+        bitrates_fd.append({2000000, 5000000});
+        samplePoints.append({875});
+        samplePoints_fd.append({750});
+    }
+    else if(_manufacturer == WeActStudio)
+    {
+        bitrates.append({10000, 20000, 50000, 83333, 100000, 125000, 250000, 500000, 800000, 1000000});
+        bitrates_fd.append({1000000, 2000000, 3000000, 4000000, 5000000});
+        samplePoints.append({875});
+        samplePoints_fd.append({750});
+    }
 
     unsigned i=0;
     foreach (unsigned br, bitrates) {
@@ -158,10 +194,22 @@ unsigned SLCANInterface::getBitrate()
 
 uint32_t SLCANInterface::getCapabilities()
 {
-    uint32_t retval =
-        CanInterface::capability_config_os |
-        CanInterface::capability_listen_only |
-        CanInterface::capability_auto_restart;
+    uint32_t retval = 0;
+
+    if(_manufacturer == CANable)
+    {
+        retval =
+            CanInterface::capability_config_os |
+            CanInterface::capability_auto_restart |
+            CanInterface::capability_listen_only;
+    }
+    else if(_manufacturer == WeActStudio)
+    {
+        retval =
+            // CanInterface::capability_config_os |
+            // CanInterface::capability_auto_restart |
+            CanInterface::capability_listen_only;
+    }
 
     if (supportsCanFD()) {
         retval |= CanInterface::capability_canfd;
@@ -250,6 +298,11 @@ void SLCANInterface::open()
     _serport->flush();
     _serport->clear();
 
+    // Close CAN port
+    _serport->write("C\r", 2);
+    _serport->flush();
+    _serport->waitForBytesWritten(300);
+
     // Set the classic CAN bitrate
     switch(_settings.bitrate())
     {
@@ -329,15 +382,28 @@ void SLCANInterface::open()
                 break;
         }
     }
-
     _serport->waitForBytesWritten(300);
 
+    // Set Listen Only Mode
+    if(_settings.isListenOnlyMode())
+    {
+        _serport->write("M1\r", 3);
+        _serport->flush();
+    }
+    else
+    {
+        _serport->write("M0\r", 3);
+        _serport->flush();
+    }
+    _serport->waitForBytesWritten(300);
 
     // Open the port
-    _serport->write("O\r", 3);
+    _serport->write("O\r", 2);
     _serport->flush();
+    _serport->waitForBytesWritten(300);
 
     _msg_queue.clear();
+    _send_wait_respond = 0;
 
     _isOpen = true;
     _isOffline = false;
@@ -372,6 +438,7 @@ void SLCANInterface::close()
         _serport->write("C\r", 2);        
         _serport->flush();
         _serport->waitForBytesWritten(300);
+        _serport->waitForReadyRead(10);
         _serport->clear();
         _serport->close();
     }
@@ -407,6 +474,7 @@ void SLCANInterface::sendMessage(const CanMessage &msg) {
             buf[msg_idx] = 'd';
         }
     }
+
     // Message is not FD
     // Add character for frame type
     else
@@ -512,6 +580,8 @@ void SLCANInterface::sendMessage(const CanMessage &msg) {
 
 bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeout_ms)
 {
+    QDateTime datetime;
+
     // Don't saturate the thread. Read the buffer every 1ms.
     QThread().msleep(1);
 
@@ -520,6 +590,15 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
         if(_isOpen)
             close();
         return false;
+    }
+    else
+    {
+        datetime = QDateTime::currentDateTime();
+        if(datetime.toMSecsSinceEpoch() - _readMessage_datetime.toMSecsSinceEpoch() > 3000)
+        {
+            _status.can_state = state_ok;
+            _send_wait_respond = 0;
+        }
     }
 
     // Transmit all items that are queued
@@ -533,11 +612,13 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
         // Write string to serial device
         if(_serport->write(tmp.toStdString().c_str(), tmp.length())==tmp.length())
         {
-            _status.tx_count ++;
+            _send_wait_respond ++;
+            _readMessage_datetime = QDateTime::currentDateTime();
         }
         else
         {
             _status.tx_errors ++;
+            _send_wait_respond = 0;
         }
         _serport->flush();
         _serport->waitForBytesWritten(300);
@@ -578,20 +659,53 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
     while(_rxbuf_tail != _rxbuf_head)
     {
         // Save data if room
-        if(_rx_linbuf_ctr < SLCAN_MTU)
+        if(_rx_linbuf_ctr <= SLCAN_MTU)
         {
-            _rx_linbuf[_rx_linbuf_ctr++] = _rxbuf[_rxbuf_tail];
-
+            _rx_linbuf[_rx_linbuf_ctr] = _rxbuf[_rxbuf_tail];
+            _rx_linbuf_ctr++;
             // If we have a newline, then we just finished parsing a CAN message.
             if(_rxbuf[_rxbuf_tail] == '\r')
             {
                 CanMessage msg;
                 ret = parseMessage(msg);
-                msglist.append(msg);
-                _rx_linbuf_ctr = 0;
                 if(ret == true)
                 {
+                     msglist.append(msg);
                     _status.rx_count ++;
+                }
+                else
+                {
+                    if(_rx_linbuf_ctr == 1)
+                    {
+                        if(_send_wait_respond)
+                        {
+                            datetime = QDateTime::currentDateTime();
+                            if(datetime.toMSecsSinceEpoch() - _readMessage_datetime.toMSecsSinceEpoch() < 200)
+                            {
+                                _status.tx_count ++;
+                                _status.can_state = state_tx_success;
+                            }
+                            _send_wait_respond --;
+                        }
+                    }
+                }
+                _rx_linbuf_ctr = 0;
+            }
+            else if(_rxbuf[_rxbuf_tail] == '\x07')
+            {
+                if(_rx_linbuf_ctr == 1)
+                {
+                    if(_send_wait_respond)
+                    {
+                        datetime = QDateTime::currentDateTime();
+                        if(datetime.toMSecsSinceEpoch() - _readMessage_datetime.toMSecsSinceEpoch() < 200)
+                        {
+                            _status.tx_errors ++;
+                            _status.can_state = state_tx_fail;
+                        }
+                        _send_wait_respond --;
+                        _rx_linbuf_ctr = 0;
+                    }
                 }
             }
         }
@@ -605,7 +719,6 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
         _rxbuf_tail = (_rxbuf_tail + 1) % RXCIRBUF_LEN;
     }
     _rxbuf_mutex.unlock();
-
     return ret;
 }
 

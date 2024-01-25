@@ -31,7 +31,7 @@ MeasurementInterface::MeasurementInterface()
     _bitrate(500000),
     _samplePoint(875),
     _isCanFD(false),
-    _fdBitrate(4000000),
+    _fdBitrate(2000000),
     _fdSamplePoint(875),
 
     _isListenOnlyMode(false),

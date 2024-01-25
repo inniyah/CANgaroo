@@ -38,7 +38,9 @@ public:
         state_passive,
         state_bus_off,
         state_stopped,
-        state_unknown
+        state_unknown,
+        state_tx_success,
+        state_tx_fail,
     };
 
     enum {

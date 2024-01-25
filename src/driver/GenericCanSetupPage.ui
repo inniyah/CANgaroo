@@ -202,7 +202,7 @@
      <x>140</x>
      <y>220</y>
      <width>411</width>
-     <height>126</height>
+     <height>131</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="vbOptions">
@@ -216,7 +216,7 @@
     <item>
      <widget class="QCheckBox" name="cbListenOnly">
       <property name="text">
-       <string>Listen only mode</string>
+       <string>Bus Monitoring mode</string>
       </property>
      </widget>
     </item>

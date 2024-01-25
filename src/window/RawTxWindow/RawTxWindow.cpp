@@ -39,14 +39,22 @@ RawTxWindow::RawTxWindow(QWidget *parent, Backend &backend) :
 
     connect(ui->spinBox_RepeatRate, SIGNAL(valueChanged(int)), this, SLOT(changeRepeatRate(int)));
 
+    connect(ui->fieldAddress, SIGNAL(textChanged(QString)), this, SLOT(fieldAddress_textChanged(QString)));
+
     connect(ui->comboBoxInterface, SIGNAL(currentIndexChanged(int)), this, SLOT(updateCapabilities()));
     connect(ui->checkbox_FD, SIGNAL(stateChanged(int)), this, SLOT(updateCapabilities()));
 
     connect(&backend, SIGNAL(beginMeasurement()),  this, SLOT(refreshInterfaces()));
 
+    connect(&backend, SIGNAL(endMeasurement()),  this, SLOT(refreshInterfaces()));
+
     // Timer for repeating messages
     repeatmsg_timer = new QTimer(this);
     connect(repeatmsg_timer, SIGNAL(timeout()), this, SLOT(sendRawMessage()));
+
+    sendstate_timer = new QTimer(this);
+    sendstate_timer->setInterval(100);
+    connect(sendstate_timer, SIGNAL(timeout()), this, SLOT(sendstate_timer_timeout()));
 
 
     // TODO: Grey out checkboxes that are invalid depending on DLC spinbox state
@@ -67,7 +75,6 @@ RawTxWindow::~RawTxWindow()
 
 void RawTxWindow::changeDLC()
 {
-
     ui->fieldByte0_0->setEnabled(true);
     ui->fieldByte1_0->setEnabled(true);
     ui->fieldByte2_0->setEnabled(true);
@@ -141,6 +148,12 @@ void RawTxWindow::changeDLC()
     ui->fieldByte7_7->setEnabled(true);
 
     uint8_t dlc = ui->comboBoxDLC->currentData().toUInt();
+
+    // If DLC > 8, must be FD
+    if(dlc > 8)
+    {
+        ui->checkbox_FD->setChecked(true);
+    }
 
     switch(dlc)
     {
@@ -406,9 +419,21 @@ void RawTxWindow::refreshInterfaces()
     }
 
     if(cb_idx == 0)
+    {
         disableTxWindow(1);
+        if(sendstate_timer->isActive())
+        {
+            sendstate_timer->stop();
+        }
+    }
     else
+    {
         disableTxWindow(0);
+        if(!sendstate_timer->isActive())
+        {
+            sendstate_timer->start();
+        }
+    }
 
     updateCapabilities();
 }
@@ -495,7 +520,6 @@ void RawTxWindow::sendRawMessage()
     data_int[data_ctr++] = ui->fieldByte6_7->text().toUpper().toInt(NULL, 16);
     data_int[data_ctr++] = ui->fieldByte7_7->text().toUpper().toInt(NULL, 16);
 
-
     uint32_t address = ui->fieldAddress->text().toUpper().toUInt(NULL, 16);
 
     // If address is beyond std address namespace, force extended
@@ -553,6 +577,18 @@ void RawTxWindow::sendRawMessage()
              msg.isExtended(), msg.isRTR(), msg.isErrorFrame(), msg.isFD(), msg.isBRS());
     log_info(outmsg);
 
+}
+
+void RawTxWindow::sendstate_timer_timeout()
+{
+    CanInterface *intf = _backend.getInterfaceById((CanInterfaceId)ui->comboBoxInterface->currentData().toUInt());
+    if(intf->isOpen())
+    {
+        if(intf->getState() == CanInterface::state_tx_fail || intf->getState() == CanInterface::state_tx_success)
+            ui->label_3->setText(intf->getName() + ' ' + intf->getStateText());
+        else
+            ui->label_3->setText("");
+    }
 }
 
 bool RawTxWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
@@ -738,3 +774,19 @@ void RawTxWindow::showFDFields()
     ui->fieldByte7_7->show();
 }
 
+
+void RawTxWindow::fieldAddress_textChanged(QString str)
+{
+    uint32_t address = ui->fieldAddress->text().toUpper().toUInt(NULL, 16);
+
+    // If address is beyond std address namespace, force extended
+    if(address > 0x7ff || str.length() > 3)
+    {
+        ui->checkBox_IsExtended->setChecked(true);
+    }
+    else
+    {
+        ui->checkBox_IsExtended->setChecked(false);
+    }
+
+}
