@@ -83,6 +83,9 @@ class DbcStringToken : public DbcToken {
 public:
     DbcStringToken(int line, int column);
     virtual bool acceptsChar(QChar ch);
+private:
+    bool _done;
+    bool _escape;
 };
 
 class DbcRegExpToken : public DbcToken {

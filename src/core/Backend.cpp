@@ -135,11 +135,12 @@ void Backend::loadDefaultSetup(MeasurementSetup &setup)
         driver->update();
         foreach (CanInterfaceId intf, driver->getInterfaceIds()) {
             MeasurementNetwork *network = setup.createNetwork();
-            network->setName(QString().sprintf("Network %d", i++));
+            network->setName(QString().asprintf("Network %d", i++));
 
             MeasurementInterface *mi = new MeasurementInterface();
             mi->setCanInterface(intf);
             mi->setBitrate(500000);
+            mi->setFdBitrate(2000000);
             network->addInterface(mi);
         }
     }

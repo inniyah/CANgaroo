@@ -87,6 +87,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _setupDlg = new SetupDialog(Backend::instance(), 0); // NOTE: must be called after drivers/plugins are initialized
 
+    _showSetupDialog_first = false;
+
 }
 
 MainWindow::~MainWindow()
@@ -264,7 +266,6 @@ bool MainWindow::saveWorkspaceToFile(QString filename)
         log_error(QString("Cannot open workspace file for writing: %1").arg(filename));
         return false;
     }
-
 }
 
 void MainWindow::newWorkspace()
@@ -273,7 +274,6 @@ void MainWindow::newWorkspace()
         stopAndClearMeasurement();
         clearWorkspace();
         createTraceWindow();
-        addRawTxWidget();
         backend().setDefaultSetup();
     }
 }
@@ -353,8 +353,12 @@ QMainWindow *MainWindow::createTraceWindow(QString title)
     }
     QMainWindow *mm = createTab(title);
     mm->setCentralWidget(new TraceWindow(mm, backend()));
-    mm->tabifyDockWidget(addStatusWidget(mm),addLogWidget(mm));
-
+    QDockWidget *dockStatusWidget = addStatusWidget(mm);
+    QDockWidget *dockLogWidget = addLogWidget(mm);
+    QDockWidget *dockRawTxWidget = addRawTxWidget(mm);
+    mm->splitDockWidget(dockLogWidget,dockRawTxWidget,Qt::Horizontal);
+    mm->splitDockWidget(dockStatusWidget,dockLogWidget,Qt::Horizontal);
+    mm->tabifyDockWidget(dockStatusWidget,dockLogWidget);
     ui->mainTabs->setCurrentWidget(mm);
     return mm;
 }
@@ -381,7 +385,7 @@ void MainWindow::addGraphWidget(QMainWindow *parent)
     parent->addDockWidget(Qt::BottomDockWidgetArea, dock);
 }
 
-void MainWindow::addRawTxWidget(QMainWindow *parent)
+QDockWidget *MainWindow::addRawTxWidget(QMainWindow *parent)
 {
     if (!parent) {
         parent = currentTab();
@@ -389,6 +393,7 @@ void MainWindow::addRawTxWidget(QMainWindow *parent)
     QDockWidget *dock = new QDockWidget("Transmit View", parent);
     dock->setWidget(new RawTxWindow(dock, backend()));
     parent->addDockWidget(Qt::BottomDockWidgetArea, dock);
+    return dock;
 }
 
 
@@ -460,8 +465,16 @@ void MainWindow::showAboutDialog()
 
 void MainWindow::startMeasurement()
 {
-    if (showSetupDialog()) {
-        backend().clearTrace();
+    if(!_showSetupDialog_first)
+    {
+        if (showSetupDialog()) {
+            backend().clearTrace();
+            backend().startMeasurement();
+            _showSetupDialog_first = true;
+        }
+    }
+    else
+    {
         backend().startMeasurement();
     }
 }
@@ -478,7 +491,8 @@ void MainWindow::saveTraceToFile()
 
     QFileDialog fileDialog(0, "Save Trace to file", QDir::currentPath(), filters);
     fileDialog.setAcceptMode(QFileDialog::AcceptSave);
-    fileDialog.setConfirmOverwrite(true);
+    fileDialog.setOption(QFileDialog::DontConfirmOverwrite,false);
+    //fileDialog.setConfirmOverwrite(true);
     fileDialog.selectNameFilter(defaultFilter);
     fileDialog.setDefaultSuffix("asc");
     if (fileDialog.exec()) {

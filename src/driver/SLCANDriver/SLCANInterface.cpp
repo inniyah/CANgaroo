@@ -35,7 +35,6 @@
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QThread>
-#include <iostream>
 
 SLCANInterface::SLCANInterface(SLCANDriver *driver, int index, QString name, bool fd_support, uint32_t manufacturer)
   : CanInterface((CanDriver *)driver),
@@ -101,6 +100,10 @@ QString SLCANInterface::getDetailsStr() const {
         {
             return "WeAct Studio USB2CAN with standard CAN support";
         }
+    }
+    else
+    {
+        return "Not Support";
     }
 }
 

@@ -3,5 +3,6 @@
         <file>assets/mdibg.png</file>
         <file>assets/cangaroo.png</file>
         <file>assets/cangaroo.svg</file>
+        <file>i18n_zh_cn.qm</file>
     </qresource>
 </RCC>

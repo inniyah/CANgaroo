@@ -40,8 +40,8 @@ SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SetupDialog),
     _backend(&backend),
-    _currentNetwork(0),
-    _isReflashNetworks(false)
+    _isReflashNetworks(false),
+    _currentNetwork(0)
 {
     ui->setupUi(this);
 

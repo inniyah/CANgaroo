@@ -10,9 +10,7 @@ TARGET = cangaroo
 TEMPLATE = app
 CONFIG += warn_on
 CONFIG += link_pkgconfig
-
-TRANSLATIONS = i18n_zh_cn.ts
-RC_ICONS = cangaroo.ico
+TRANSLATIONS = i18n_zh_cn.ts i18n_en_us.ts
 
 DESTDIR = ../bin
 MOC_DIR = ../build/moc

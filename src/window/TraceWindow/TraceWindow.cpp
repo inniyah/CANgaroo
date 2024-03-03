@@ -33,7 +33,9 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     ConfigurableWidget(parent),
     ui(new Ui::TraceWindow),
     _backend(&backend),
-    _doAutoScroll(false)
+    _mode(mode_linear),
+    _doAutoScroll(false),
+    _timestampMode(timestamp_mode_absolute)
 {
     ui->setupUi(this);
 

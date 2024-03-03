@@ -78,8 +78,6 @@ QVariant BaseTraceViewModel::headerData(int section, Qt::Orientation orientation
 
 QVariant BaseTraceViewModel::data(const QModelIndex &index, int role) const
 {
-    int row = index.row();
-    int col = index.column();
     switch (role) {
         case Qt::DisplayRole:
             return data_DisplayRole(index, role);
@@ -88,7 +86,19 @@ QVariant BaseTraceViewModel::data(const QModelIndex &index, int role) const
         case Qt::TextColorRole:
             return data_TextColorRole(index, role);
         case Qt::ToolTipRole:
-            return index.data(Qt::DisplayRole).toString();
+        {
+            QString data = index.data(Qt::DisplayRole).toString();
+            uint  length = data.length();
+            if(length>24)
+            {
+                uint div = length / 24;
+                for(uint i = 0;i< div-1;i++)
+                {
+                    data.insert(24*(i+1)+i,"\n");
+                }
+            }
+            return data;
+        }
             //return QString("Row%1, Column%2").arg(row + 1).arg(col +1);
         default:
             return QVariant();
@@ -123,9 +133,9 @@ QVariant BaseTraceViewModel::formatTimestamp(timestamp_mode_t mode, const CanMes
         double t_current = currentMsg.getFloatTimestamp();
         double t_last = lastMsg.getFloatTimestamp();
         if (t_last==0) {
-            return QVariant();
+            return QString().asprintf("%.04lf", 0.00);
         } else {
-            return QString().sprintf("%.04lf", t_current-t_last);
+            return QString().asprintf("%.04lf", t_current-t_last);
         }
 
     } else if (mode==timestamp_mode_absolute) {
@@ -135,7 +145,7 @@ QVariant BaseTraceViewModel::formatTimestamp(timestamp_mode_t mode, const CanMes
     } else if (mode==timestamp_mode_relative) {
 
         double t_current = currentMsg.getFloatTimestamp();
-        return QString().sprintf("%.04lf", t_current - backend()->getTimestampAtMeasurementStart());
+        return QString().asprintf("%.04lf", t_current - backend()->getTimestampAtMeasurementStart());
 
     }
 
