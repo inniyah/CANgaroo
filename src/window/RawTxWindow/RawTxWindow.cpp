@@ -366,7 +366,10 @@ void RawTxWindow::updateCapabilities()
 
 void RawTxWindow::changeRepeatRate(int ms)
 {
-    repeatmsg_timer->setInterval(ms);
+    if(ms)
+        repeatmsg_timer->setInterval(ms);
+    else
+        ui->spinBox_RepeatRate->setValue(1);
 }
 
 void RawTxWindow::sendRepeatMessage(bool enable)
@@ -374,15 +377,18 @@ void RawTxWindow::sendRepeatMessage(bool enable)
     if(enable)
     {
         repeatmsg_timer->start(ui->spinBox_RepeatRate->value());
+        ui->spinBox_RepeatRate->setEnabled(false);
+        ui->singleSendButton->setEnabled(false);
+        ui->comboBoxInterface->setEnabled(false);
     }
     else
     {
         repeatmsg_timer->stop();
+        ui->spinBox_RepeatRate->setEnabled(true);
+        ui->singleSendButton->setEnabled(true);
+        ui->comboBoxInterface->setEnabled(true);
     }
 }
-
-
-
 
 void RawTxWindow::disableTxWindow(int disable)
 {
