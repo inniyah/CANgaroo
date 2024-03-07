@@ -73,6 +73,8 @@ SLCANInterface::SLCANInterface(SLCANDriver *driver, int index, QString name, boo
     _status.tx_dropped = 0;
 
     _readMessage_datetime = QDateTime::currentDateTime();
+
+    _readMessage_datetime_run = QDateTime::currentDateTime();
 }
 
 SLCANInterface::~SLCANInterface() {
@@ -585,8 +587,18 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
 {
     QDateTime datetime;
 
+    datetime = QDateTime::currentDateTime();
+    if(datetime.toMSecsSinceEpoch() - _readMessage_datetime_run.toMSecsSinceEpoch() >= 1)
+    {
+        _readMessage_datetime_run = QDateTime::currentDateTime().addMSecs(1);
+    }
+    else
+    {
+        return false;
+    }
+
     // Don't saturate the thread. Read the buffer every 1ms.
-    QThread().msleep(1);
+    //QThread().msleep(1);
 
     if(_isOffline == true)
     {
@@ -623,13 +635,16 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
             _status.tx_errors ++;
             _send_wait_respond = 0;
         }
-        _serport->flush();
+        //_serport->flush();
         _serport->waitForBytesWritten(300);
         _serport_mutex.unlock();
     }
 
     // RX doesn't work on windows unless we call this for some reason
-    _serport->waitForReadyRead(1);
+    if(_serport->waitForReadyRead(1))
+    {
+        //qApp->processEvents();
+    }
 
     if(_serport->bytesAvailable())
     {

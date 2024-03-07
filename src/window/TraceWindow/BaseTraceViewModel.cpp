@@ -94,7 +94,10 @@ QVariant BaseTraceViewModel::data(const QModelIndex &index, int role) const
                 uint div = length / 24;
                 for(uint i = 0;i< div-1;i++)
                 {
-                    data.insert(24*(i+1)+i,"\n");
+                    if((i+1)%2 == 0 || index.column() != column_data)
+                        data.insert(24*(i+1)+i,"\n");
+                    else
+                        data.insert(24*(i+1)+i," ");
                 }
             }
             return data;

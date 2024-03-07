@@ -136,6 +136,7 @@ private:
 
     QDateTime  _readMessage_datetime;
     uint32_t _send_wait_respond;
+    QDateTime  _readMessage_datetime_run;
 
     bool updateStatus();
     bool parseMessage(CanMessage &msg);

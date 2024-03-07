@@ -50,12 +50,12 @@ RawTxWindow::RawTxWindow(QWidget *parent, Backend &backend) :
 
     // Timer for repeating messages
     repeatmsg_timer = new QTimer(this);
-    connect(repeatmsg_timer, SIGNAL(timeout()), this, SLOT(sendRawMessage()));
+    repeatmsg_timer->setTimerType(Qt::PreciseTimer);
+    connect(repeatmsg_timer, SIGNAL(timeout()), this, SLOT(repeatmsg_timer_timeout()));
 
     sendstate_timer = new QTimer(this);
     sendstate_timer->setInterval(100);
     connect(sendstate_timer, SIGNAL(timeout()), this, SLOT(sendstate_timer_timeout()));
-
 
     // TODO: Grey out checkboxes that are invalid depending on DLC spinbox state
     //connect(ui->fieldDLC, SIGNAL(valueChanged(int)), this, SLOT(changeDLC(int)));
@@ -66,12 +66,10 @@ RawTxWindow::RawTxWindow(QWidget *parent, Backend &backend) :
 
 }
 
-
 RawTxWindow::~RawTxWindow()
 {
     delete ui;
 }
-
 
 void RawTxWindow::changeDLC()
 {
@@ -266,7 +264,6 @@ void RawTxWindow::changeDLC()
 
 void RawTxWindow::updateCapabilities()
 {
-
     // check if intf suports fd, if, enable, else dis
     //CanInterface *intf = _backend.getInterfaceById(idx);
     if(ui->comboBoxInterface->count() > 0)
@@ -376,6 +373,15 @@ void RawTxWindow::sendRepeatMessage(bool enable)
 {
     if(enable)
     {
+        reflash_can_msg();
+
+        char outmsg[256];
+        _intf = _backend.getInterfaceById((CanInterfaceId)ui->comboBoxInterface->currentData().toUInt());
+        snprintf(outmsg, 256, "Send [%s] to %d on port %s [ext=%u rtr=%u err=%u fd=%u brs=%u]",
+                 _can_msg.getDataHexString().toLocal8Bit().constData(), _can_msg.getId(), _intf->getName().toLocal8Bit().constData(),
+                 _can_msg.isExtended(), _can_msg.isRTR(), _can_msg.isErrorFrame(), _can_msg.isFD(), _can_msg.isBRS());
+        log_info(outmsg);
+
         repeatmsg_timer->start(ui->spinBox_RepeatRate->value());
         ui->spinBox_RepeatRate->setEnabled(false);
         ui->singleSendButton->setEnabled(false);
@@ -390,10 +396,22 @@ void RawTxWindow::sendRepeatMessage(bool enable)
     }
 }
 
+void RawTxWindow::repeatmsg_timer_timeout()
+{
+    if(!_intf->isOpen())
+    {
+        log_error(_intf->getName() + " not Open!");
+        return;
+    }
+    _intf->sendMessage(_can_msg);
+}
+
 void RawTxWindow::disableTxWindow(int disable)
 {
     if(disable)
     {
+        if(ui->repeatSendButton->isChecked())
+            ui->repeatSendButton->toggle();
         this->setDisabled(1);
     }
     else
@@ -444,12 +462,12 @@ void RawTxWindow::refreshInterfaces()
     updateCapabilities();
 }
 
-void RawTxWindow::sendRawMessage()
+void RawTxWindow::reflash_can_msg()
 {
-    CanMessage msg;
-
     bool en_extended = ui->checkBox_IsExtended->isChecked();
     bool en_rtr = ui->checkBox_IsRTR->isChecked();
+    bool en_brs = ui->checkbox_BRS->isChecked();
+    bool en_fd = ui->checkbox_FD->isChecked();
 
     uint8_t data_int[64];
     int data_ctr = 0;
@@ -547,26 +565,30 @@ void RawTxWindow::sendRawMessage()
     // If DLC > 8, must be FD
     if(dlc > 8)
     {
+        en_fd = true;
         ui->checkbox_FD->setChecked(true);
     }
+
+    _can_msg.setId(address);
+    _can_msg.setLength(dlc);
+
+    _can_msg.setExtended(en_extended);
+    _can_msg.setRTR(en_rtr);
+    _can_msg.setErrorFrame(false);
+
+    _can_msg.setBRS(en_brs);
+    _can_msg.setFD(en_fd);
 
     // Set payload data
     for(int i=0; i<dlc; i++)
     {
-        msg.setDataAt(i, data_int[i]);
+        _can_msg.setDataAt(i, data_int[i]);
     }
+}
 
-    msg.setId(address);
-    msg.setLength(dlc);
-
-    msg.setExtended(en_extended);
-    msg.setRTR(en_rtr);
-    msg.setErrorFrame(false);
-
-    if(ui->checkbox_BRS->isChecked())
-        msg.setBRS(true);
-    if(ui->checkbox_FD->isChecked())
-        msg.setFD(true);
+void RawTxWindow::sendRawMessage()
+{
+    reflash_can_msg();
 
     CanInterface *intf = _backend.getInterfaceById((CanInterfaceId)ui->comboBoxInterface->currentData().toUInt());
     if(!intf->isOpen())
@@ -574,13 +596,12 @@ void RawTxWindow::sendRawMessage()
         log_error(intf->getName() + " not Open!");
         return;
     }
-    intf->sendMessage(msg);
-
+    intf->sendMessage(_can_msg);
 
     char outmsg[256];
     snprintf(outmsg, 256, "Send [%s] to %d on port %s [ext=%u rtr=%u err=%u fd=%u brs=%u]",
-             msg.getDataHexString().toLocal8Bit().constData(), msg.getId(), intf->getName().toLocal8Bit().constData(),
-             msg.isExtended(), msg.isRTR(), msg.isErrorFrame(), msg.isFD(), msg.isBRS());
+             _can_msg.getDataHexString().toLocal8Bit().constData(), _can_msg.getId(), intf->getName().toLocal8Bit().constData(),
+             _can_msg.isExtended(), _can_msg.isRTR(), _can_msg.isErrorFrame(), _can_msg.isFD(), _can_msg.isBRS());
     log_info(outmsg);
 
 }

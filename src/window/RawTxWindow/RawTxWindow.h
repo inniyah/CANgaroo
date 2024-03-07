@@ -56,13 +56,21 @@ private slots:
 
     void sendstate_timer_timeout();
 
+    void repeatmsg_timer_timeout();
+
 
 private:
     Ui::RawTxWindow *ui;
     Backend &_backend;
     QTimer *repeatmsg_timer;
     QTimer *sendstate_timer;
+
+    CanMessage _can_msg;
+    CanInterface *_intf;
+
     void hideFDFields();
     void showFDFields();
+
+    void reflash_can_msg(void);
 
 };
