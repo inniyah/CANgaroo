@@ -27,7 +27,6 @@
 #include <QTimer>
 
 class CANBlasterDriver;
-
 typedef struct {
     bool supports_canfd;
     bool supports_timing;
@@ -51,6 +50,7 @@ typedef struct {
 } can_status_t;
 
 class CANBlasterInterface: public CanInterface {
+    Q_OBJECT
 public:
     CANBlasterInterface(CANBlasterDriver *driver, int index, QString name, bool fd_support);
     virtual ~CANBlasterInterface();

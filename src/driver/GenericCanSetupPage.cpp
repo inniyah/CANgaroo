@@ -24,6 +24,12 @@ GenericCanSetupPage::GenericCanSetupPage(QWidget *parent) :
     connect(ui->cbOneShot, SIGNAL(stateChanged(int)), this, SLOT(updateUI()));
     connect(ui->cbTripleSampling, SIGNAL(stateChanged(int)), this, SLOT(updateUI()));
     connect(ui->cbAutoRestart, SIGNAL(stateChanged(int)), this, SLOT(updateUI()));
+
+    connect(ui->cbCustomBitrate, SIGNAL(stateChanged(int)), this, SLOT(updateUI()));
+    connect(ui->cbCustomFdBitrate, SIGNAL(stateChanged(int)), this, SLOT(updateUI()));
+
+    connect(ui->CustomBitrateSet, SIGNAL(textChanged(QString)), this, SLOT(updateUI()));
+    connect(ui->CustomFdBitrateSet, SIGNAL(textChanged(QString)), this, SLOT(updateUI()));
 }
 
 GenericCanSetupPage::~GenericCanSetupPage()
@@ -59,6 +65,12 @@ void GenericCanSetupPage::onShowInterfacePage(SetupDialog &dlg, MeasurementInter
     ui->cbTripleSampling->setChecked(_mi->isTripleSampling());
     ui->cbAutoRestart->setChecked(_mi->doAutoRestart());
 
+    ui->cbCustomBitrate->setChecked(_mi->isCustomBitrate());
+    ui->cbCustomFdBitrate->setChecked(_mi->isCustomFdBitrate());
+
+    ui->CustomBitrateSet->setText(QString::number( _mi->customBitrate(), 16 ).toUpper());
+    ui->CustomFdBitrateSet->setText(QString::number( _mi->customFdBitrate(), 16 ).toUpper());
+
     disenableUI(_mi->doConfigure());
     dlg.displayPage(this);
 
@@ -79,6 +91,12 @@ void GenericCanSetupPage::updateUI()
         _mi->setSamplePoint(ui->cbSamplePoint->currentData().toUInt());
         _mi->setFdBitrate(ui->cbBitrateFD->currentData().toUInt());
         _mi->setFdSamplePoint(ui->cbSamplePointFD->currentData().toUInt());
+
+        _mi->setCustomBitrateEn(ui->cbCustomBitrate->isChecked());
+        _mi->setCustomFdBitrateEn(ui->cbCustomFdBitrate->isChecked());
+
+        _mi->setCustomBitrate(ui->CustomBitrateSet->text().toUpper().toUInt(NULL, 16));
+        _mi->setCustomFdBitrate(ui->CustomFdBitrateSet->text().toUpper().toUInt(NULL, 16));
 
         _enable_ui_updates = false;
 
@@ -179,16 +197,22 @@ void GenericCanSetupPage::disenableUI(bool enabled)
     CanInterface *intf = backend().getInterfaceById(_mi->canInterface());
     uint32_t caps = intf->getCapabilities();
 
-    ui->cbBitrate->setEnabled(enabled);
-    ui->cbSamplePoint->setEnabled(enabled);
+    ui->cbBitrate->setEnabled(!ui->cbCustomBitrate->isChecked());
+    ui->cbSamplePoint->setEnabled(!ui->cbCustomBitrate->isChecked());
     ui->cbConfigOS->setEnabled(caps & CanInterface::capability_config_os);
 
-    ui->cbBitrateFD->setEnabled(enabled && (caps & CanInterface::capability_canfd));
-    ui->cbSamplePointFD->setEnabled(enabled && (caps & CanInterface::capability_canfd));
+    ui->cbBitrateFD->setEnabled(!ui->cbCustomFdBitrate->isChecked() && (caps & CanInterface::capability_canfd));
+    ui->cbSamplePointFD->setEnabled(!ui->cbCustomFdBitrate->isChecked() && (caps & CanInterface::capability_canfd));
     ui->cbListenOnly->setEnabled(enabled && (caps & CanInterface::capability_listen_only));
     ui->cbOneShot->setEnabled(enabled && (caps & CanInterface::capability_one_shot));
     ui->cbTripleSampling->setEnabled(enabled && (caps & CanInterface::capability_triple_sampling));
     ui->cbAutoRestart->setEnabled(enabled && (caps & CanInterface::capability_auto_restart));
+
+    ui->cbCustomBitrate->setEnabled(enabled && (caps & CanInterface::capability_custom_bitrate));
+    ui->cbCustomFdBitrate->setEnabled(enabled && (caps & CanInterface::capability_custom_canfd_bitrate));
+
+    ui->CustomBitrateSet->setEnabled(ui->cbCustomBitrate->isChecked());
+    ui->CustomFdBitrateSet->setEnabled(ui->cbCustomFdBitrate->isChecked());
 }
 
 Backend &GenericCanSetupPage::backend()

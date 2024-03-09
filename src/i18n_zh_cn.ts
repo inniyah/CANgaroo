@@ -12,79 +12,119 @@
 <context>
     <name>GenericCanSetupPage</name>
     <message>
-        <location filename="driver/GenericCanSetupPage.ui" line="14"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="19"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="driver/GenericCanSetupPage.ui" line="26"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="31"/>
         <source>Driver:</source>
         <translation type="unfinished">驱动：</translation>
     </message>
     <message>
-        <location filename="driver/GenericCanSetupPage.ui" line="39"/>
-        <location filename="driver/GenericCanSetupPage.ui" line="65"/>
-        <location filename="driver/GenericCanSetupPage.ui" line="91"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="44"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="70"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="96"/>
         <source>TextLabel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="driver/GenericCanSetupPage.ui" line="52"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="57"/>
         <source>Interface:</source>
         <translation>接口：</translation>
     </message>
     <message>
-        <location filename="driver/GenericCanSetupPage.ui" line="78"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="83"/>
         <source>Interface Details:</source>
         <translation type="unfinished">接口描述：</translation>
     </message>
     <message>
-        <location filename="driver/GenericCanSetupPage.ui" line="104"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="109"/>
         <source>Bitrate:</source>
         <translation type="unfinished">波特率：</translation>
     </message>
     <message>
-        <location filename="driver/GenericCanSetupPage.ui" line="127"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="132"/>
         <source>Sample Point:</source>
         <translation type="unfinished">采样点：</translation>
     </message>
     <message>
-        <location filename="driver/GenericCanSetupPage.ui" line="150"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="155"/>
+        <source>Data Bitrate:</source>
+        <translation type="unfinished">数据段波特率：</translation>
+    </message>
+    <message>
+        <location filename="driver/GenericCanSetupPage.ui" line="178"/>
+        <source>Data Sample Point:</source>
+        <translation type="unfinished">数据段采样点：</translation>
+    </message>
+    <message>
+        <location filename="driver/GenericCanSetupPage.ui" line="252"/>
+        <source>Custom Bitrate + Sample Point</source>
+        <translation type="unfinished">自定义波特率+采样点</translation>
+    </message>
+    <message>
+        <location filename="driver/GenericCanSetupPage.ui" line="259"/>
+        <source>Custom CAN FD Data Bitrate + Sample Point</source>
+        <translation type="unfinished">自定义CANFD数据段波特率+采样点</translation>
+    </message>
+    <message>
+        <location filename="driver/GenericCanSetupPage.ui" line="278"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="341"/>
+        <source>HHHH</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="driver/GenericCanSetupPage.ui" line="312"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="325"/>
+        <source>Seg1+Seg2 (Hex)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="driver/GenericCanSetupPage.ui" line="382"/>
+        <source>CAN FD Data Phase Setting</source>
+        <translation type="unfinished">CAN FD 数据段设置</translation>
+    </message>
+    <message>
+        <location filename="driver/GenericCanSetupPage.ui" line="402"/>
+        <source>CAN Setting / CAN FD Arbitration Phase Setting</source>
+        <translation type="unfinished">CAN设置 / CAN FD 仲裁段设置</translation>
+    </message>
+    <message>
         <source>CanFD Bitrate:</source>
-        <translation type="unfinished">CAN FD 波特率：</translation>
+        <translation type="obsolete">CAN FD 波特率：</translation>
     </message>
     <message>
-        <location filename="driver/GenericCanSetupPage.ui" line="173"/>
         <source>CanFD SamplePoint:</source>
-        <translation type="unfinished">CAN FD 采样点：</translation>
+        <translation type="obsolete">CAN FD 采样点：</translation>
     </message>
     <message>
-        <location filename="driver/GenericCanSetupPage.ui" line="196"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="201"/>
         <source>Options:</source>
         <translation type="unfinished">选项：</translation>
     </message>
     <message>
-        <location filename="driver/GenericCanSetupPage.ui" line="212"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="217"/>
         <source>configured by operating system</source>
         <translation type="unfinished">由操作系统配置</translation>
     </message>
     <message>
-        <location filename="driver/GenericCanSetupPage.ui" line="219"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="224"/>
         <source>Bus Monitoring mode</source>
         <translation type="unfinished">使能总线监控模式</translation>
     </message>
     <message>
-        <location filename="driver/GenericCanSetupPage.ui" line="226"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="231"/>
         <source>One-Shot mode</source>
         <translation type="unfinished">使能单次模式</translation>
     </message>
     <message>
-        <location filename="driver/GenericCanSetupPage.ui" line="233"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="238"/>
         <source>Triple Sampling</source>
         <translation type="unfinished">使能三倍采样</translation>
     </message>
     <message>
-        <location filename="driver/GenericCanSetupPage.ui" line="240"/>
+        <location filename="driver/GenericCanSetupPage.ui" line="245"/>
         <source>Auto-Restart on bus off condition</source>
         <translation type="unfinished">在总线关闭状态下自动重启</translation>
     </message>
@@ -113,183 +153,183 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="mainwindow.ui" line="14"/>
+        <location filename="mainwindow.ui" line="17"/>
         <source>cangaroo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="77"/>
+        <location filename="mainwindow.ui" line="80"/>
         <source>&amp;File</source>
         <translation type="unfinished">&amp;文件</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="89"/>
+        <location filename="mainwindow.ui" line="92"/>
         <source>&amp;Window</source>
         <translation type="unfinished">&amp;窗口</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="93"/>
+        <location filename="mainwindow.ui" line="96"/>
         <source>&amp;New</source>
         <translation type="unfinished">&amp;新建</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="106"/>
+        <location filename="mainwindow.ui" line="109"/>
         <source>&amp;Measurement</source>
         <translation type="unfinished">&amp;测量</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="115"/>
+        <location filename="mainwindow.ui" line="118"/>
         <source>&amp;Help</source>
         <translation type="unfinished">&amp;帮助</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="121"/>
+        <location filename="mainwindow.ui" line="124"/>
         <source>&amp;Trace</source>
         <translation type="unfinished">&amp;跟踪</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="135"/>
+        <location filename="mainwindow.ui" line="138"/>
         <source>E&amp;xit</source>
         <oldsource>&amp;Exit</oldsource>
         <translation type="unfinished">&amp;退出</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="138"/>
+        <location filename="mainwindow.ui" line="141"/>
         <source>Alt+F4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="143"/>
+        <location filename="mainwindow.ui" line="146"/>
         <source>&amp;Trace View</source>
         <translation type="unfinished">&amp;跟踪视图</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="146"/>
+        <location filename="mainwindow.ui" line="149"/>
         <source>Ctrl+Shift+T</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="151"/>
+        <location filename="mainwindow.ui" line="154"/>
         <source>&amp;Log View</source>
         <translation type="unfinished">&amp;日志视图</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="154"/>
+        <location filename="mainwindow.ui" line="157"/>
         <source>Ctrl+Shift+L</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="159"/>
+        <location filename="mainwindow.ui" line="162"/>
         <source>&amp;Setup...</source>
         <translation type="unfinished">&amp;配置...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="162"/>
+        <location filename="mainwindow.ui" line="165"/>
         <source>Ctrl+Alt+S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="167"/>
+        <location filename="mainwindow.ui" line="170"/>
         <source>Star&amp;t Measurement</source>
         <translation type="unfinished">&amp;启动</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="170"/>
+        <location filename="mainwindow.ui" line="173"/>
         <source>F5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="175"/>
+        <location filename="mainwindow.ui" line="178"/>
         <source>Sto&amp;p Measurement</source>
         <translation type="unfinished">&amp;停止</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="178"/>
+        <location filename="mainwindow.ui" line="181"/>
         <source>Shift+F5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="183"/>
+        <location filename="mainwindow.ui" line="186"/>
         <source>&amp;About</source>
         <translation type="unfinished">&amp;关于</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="188"/>
+        <location filename="mainwindow.ui" line="191"/>
         <source>&amp;Save Trace to file...</source>
         <translation type="unfinished">&amp;保存跟踪到文件</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="196"/>
+        <location filename="mainwindow.ui" line="199"/>
         <source>&amp;Graph View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="199"/>
+        <location filename="mainwindow.ui" line="202"/>
         <source>Ctrl+Shift+G</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="207"/>
+        <location filename="mainwindow.ui" line="210"/>
         <source>&amp;New Workspace...</source>
-        <translation type="unfinished">&amp;新建工作空间</translation>
+        <translation type="unfinished">&amp;新建工作空间...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="210"/>
+        <location filename="mainwindow.ui" line="213"/>
         <source>Ctrl+N</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="215"/>
+        <location filename="mainwindow.ui" line="218"/>
         <source>&amp;Save Workspace</source>
         <translation type="unfinished">&amp;保存工作空间</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="218"/>
+        <location filename="mainwindow.ui" line="221"/>
         <source>Ctrl+S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="223"/>
+        <location filename="mainwindow.ui" line="226"/>
         <source>Save Workspace &amp;As...</source>
         <translation type="unfinished">另存工作空间为...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="226"/>
+        <location filename="mainwindow.ui" line="229"/>
         <source>Ctrl+Shift+S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="231"/>
+        <location filename="mainwindow.ui" line="234"/>
         <source>&amp;Open Workspace...</source>
         <translation type="unfinished">&amp;打开工作空间...</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="234"/>
+        <location filename="mainwindow.ui" line="237"/>
         <source>Ctrl+O</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="239"/>
+        <location filename="mainwindow.ui" line="242"/>
         <source>&amp;Clear</source>
         <translation type="unfinished">&amp;清除跟踪</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="242"/>
+        <location filename="mainwindow.ui" line="245"/>
         <source>Esc</source>
         <translation type="unfinished">退出</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="247"/>
+        <location filename="mainwindow.ui" line="250"/>
         <source>Can &amp;Status View</source>
         <translation type="unfinished">&amp;CAN状态视图</translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="252"/>
+        <location filename="mainwindow.ui" line="255"/>
         <source>Graph View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="257"/>
+        <location filename="mainwindow.ui" line="260"/>
         <source>Transmit View</source>
         <translation type="unfinished">发送视图</translation>
     </message>

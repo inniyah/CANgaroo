@@ -20,11 +20,13 @@
 */
 
 #include "SLCANInterface.h"
+#include "qapplication.h"
 
 #include <core/Backend.h>
 #include <core/MeasurementInterface.h>
 #include <core/CanMessage.h>
 
+#include <iostream>
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
@@ -43,7 +45,6 @@ SLCANInterface::SLCANInterface(SLCANDriver *driver, int index, QString name, boo
     _isOpen(false),
     _isOffline(false),
     _serport(NULL),
-    _msg_queue(),
     _name(name),
     _rx_linbuf_ctr(0),
     _rxbuf_head(0),
@@ -75,6 +76,8 @@ SLCANInterface::SLCANInterface(SLCANDriver *driver, int index, QString name, boo
     _readMessage_datetime = QDateTime::currentDateTime();
 
     _readMessage_datetime_run = QDateTime::currentDateTime();
+
+    _can_msg_queue.clear();
 }
 
 SLCANInterface::~SLCANInterface() {
@@ -155,7 +158,6 @@ QList<CanTiming> SLCANInterface::getAvailableBitrates()
     return retval;
 }
 
-
 void SLCANInterface::applyConfig(const MeasurementInterface &mi)
 {
     // Save settings for port configuration
@@ -213,7 +215,9 @@ uint32_t SLCANInterface::getCapabilities()
         retval =
             // CanInterface::capability_config_os |
             // CanInterface::capability_auto_restart |
-            CanInterface::capability_listen_only;
+            CanInterface::capability_listen_only |
+            CanInterface::capability_custom_bitrate |
+            CanInterface::capability_custom_canfd_bitrate;
     }
 
     if (supportsCanFD()) {
@@ -289,11 +293,11 @@ void SLCANInterface::open()
     _serport->setFlowControl(QSerialPort::NoFlowControl);
     _serport->setReadBufferSize(2048);
 
-    qRegisterMetaType<QSerialPort::SerialPortError>("SerialThread");
-    connect(_serport, static_cast<void (QSerialPort::*)(QSerialPort::SerialPortError)>(&QSerialPort::error),  this, &SLCANInterface::handleSerialError);
-
     if (_serport->open(QIODevice::ReadWrite)) {
         //perror("Serport connected!");
+        qRegisterMetaType<QSerialPort::SerialPortError>("SerialThread");
+        connect(_serport, static_cast<void (QSerialPort::*)(QSerialPort::SerialPortError)>(&QSerialPort::error),  this, &SLCANInterface::handleSerialError);
+        //connect(_serport, SIGNAL(readyRead()),this,SLOT(serport_readyRead()));
     } else {
         perror("Serport connect failed!");
         _serport_mutex.unlock();
@@ -308,54 +312,64 @@ void SLCANInterface::open()
     _serport->flush();
     _serport->waitForBytesWritten(300);
 
-    // Set the classic CAN bitrate
-    switch(_settings.bitrate())
+    if(_settings.isCustomBitrate())
     {
-        case 1000000:
-            _serport->write("S8\r", 3);
-            _serport->flush();
-            break;
-        case 750000:
-            _serport->write("S7\r", 3);
-            _serport->flush();
-            break;
-        case 500000:
-            _serport->write("S6\r", 3);
-            _serport->flush();
-            break;
-        case 250000:
-            _serport->write("S5\r", 3);
-            _serport->flush();
-            break;
-        case 125000:
-            _serport->write("S4\r", 3);
-            _serport->flush();
-            break;
-        case 100000:
-            _serport->write("S3\r", 3);
-            _serport->flush();
-            break;
-        case 83333:
-            _serport->write("S9\r", 3);
-            _serport->flush();
-            break;
-        case 50000:
-            _serport->write("S2\r", 3);
-            _serport->flush();
-            break;
-        case 20000:
-            _serport->write("S1\r", 3);
-            _serport->flush();
-            break;
-        case 10000:
-            _serport->write("S0\r", 3);
-            _serport->flush();
-            break;
-        default:
-            // Default to 10k
-            _serport->write("S0\r", 3);
-            _serport->flush();
-            break;
+        QString _custombitrate = QString::number( _settings.customBitrate(), 16 ).toUpper();
+        std::string _custombitrate_std= 'S' + _custombitrate.toStdString() + '\r';
+        _serport->write(_custombitrate_std.c_str(), _custombitrate_std.length());
+        _serport->flush();
+    }
+    else
+    {
+        // Set the classic CAN bitrate
+        switch(_settings.bitrate())
+        {
+            case 1000000:
+                _serport->write("S8\r", 3);
+                _serport->flush();
+                break;
+            case 750000:
+                _serport->write("S7\r", 3);
+                _serport->flush();
+                break;
+            case 500000:
+                _serport->write("S6\r", 3);
+                _serport->flush();
+                break;
+            case 250000:
+                _serport->write("S5\r", 3);
+                _serport->flush();
+                break;
+            case 125000:
+                _serport->write("S4\r", 3);
+                _serport->flush();
+                break;
+            case 100000:
+                _serport->write("S3\r", 3);
+                _serport->flush();
+                break;
+            case 83333:
+                _serport->write("S9\r", 3);
+                _serport->flush();
+                break;
+            case 50000:
+                _serport->write("S2\r", 3);
+                _serport->flush();
+                break;
+            case 20000:
+                _serport->write("S1\r", 3);
+                _serport->flush();
+                break;
+            case 10000:
+                _serport->write("S0\r", 3);
+                _serport->flush();
+                break;
+            default:
+                // Default to 10k
+                _serport->write("S0\r", 3);
+                _serport->flush();
+                break;
+        }
     }
 
     _serport->waitForBytesWritten(300);
@@ -363,28 +377,38 @@ void SLCANInterface::open()
     // Set configured BRS rate
     if(_config.supports_canfd)
     {
-        switch(_settings.fdBitrate())
+        if(_settings.isCustomFdBitrate())
         {
-            case 1000000:
-                _serport->write("Y1\r", 3);
-                _serport->flush();
-                break;
-            case 2000000:
-                _serport->write("Y2\r", 3);
-                _serport->flush();
-                break;
-            case 3000000:
-                _serport->write("Y3\r", 3);
-                _serport->flush();
-                break;
-            case 4000000:
-                _serport->write("Y4\r", 3);
-                _serport->flush();
-                break;
-            case 5000000:
-                _serport->write("Y5\r", 3);
-                _serport->flush();
-                break;
+            QString _customfdbitrate = QString::number( _settings.customFdBitrate(), 16 ).toUpper();
+            std::string _customfdbitrate_std= 'Y' + _customfdbitrate.toStdString() + '\r';
+            _serport->write(_customfdbitrate_std.c_str(), _customfdbitrate_std.length());
+            _serport->flush();
+        }
+        else
+        {
+            switch(_settings.fdBitrate())
+            {
+                case 1000000:
+                    _serport->write("Y1\r", 3);
+                    _serport->flush();
+                    break;
+                case 2000000:
+                    _serport->write("Y2\r", 3);
+                    _serport->flush();
+                    break;
+                case 3000000:
+                    _serport->write("Y3\r", 3);
+                    _serport->flush();
+                    break;
+                case 4000000:
+                    _serport->write("Y4\r", 3);
+                    _serport->flush();
+                    break;
+                case 5000000:
+                    _serport->write("Y5\r", 3);
+                    _serport->flush();
+                    break;
+            }
         }
     }
     _serport->waitForBytesWritten(300);
@@ -407,7 +431,7 @@ void SLCANInterface::open()
     _serport->flush();
     _serport->waitForBytesWritten(300);
 
-    _msg_queue.clear();
+    _can_msg_queue.clear();
     _send_wait_respond = 0;
 
     _isOpen = true;
@@ -431,16 +455,69 @@ void SLCANInterface::handleSerialError(QSerialPort::SerialPortError error)
 
         _isOffline = true;
     }
+
+    QString  ERRORString = NULL ;
+    switch (error) {
+    case QSerialPort::NoError:
+        ERRORString=  "No Error";
+        break;
+    case QSerialPort::DeviceNotFoundError:
+        ERRORString= "Device Not Found";
+        break;
+    case QSerialPort::PermissionError:
+        ERRORString= "Permission Denied";
+        break;
+    case QSerialPort::OpenError:
+        ERRORString= "Open Error";
+        break;
+    case QSerialPort::ParityError:
+        ERRORString= "Parity Error";
+        break;
+    case QSerialPort::FramingError:
+        ERRORString= "Framing Error";
+        break;
+    case QSerialPort::BreakConditionError:
+        ERRORString= "Break Condition";
+        break;
+    case QSerialPort::WriteError:
+        ERRORString= "Write Error";
+        break;
+    case QSerialPort::ReadError:
+        ERRORString= "Read Error";
+        break;
+    case QSerialPort::ResourceError:
+        ERRORString= "Resource Error";
+        break;
+    case QSerialPort::UnsupportedOperationError:
+        ERRORString= "Unsupported Operation";
+        break;
+    case QSerialPort::UnknownError:
+        ERRORString= "Unknown Error";
+        break;
+    case QSerialPort::TimeoutError:
+        //ERRORString= "Timeout Error";
+        break;
+    case QSerialPort::NotOpenError:
+        ERRORString= "Not Open Error";
+        break;
+    default:
+        ERRORString= "Other Error";
+    }
+    if(ERRORString != NULL)
+        std::cout << "SerialPortWorker::errorOccurred  ,info is  " << ERRORString.toStdString() << std::endl;
 }
 
 void SLCANInterface::close()
 {
     _serport_mutex.lock();
 
+    _isOpen = false;
+    _status.can_state = state_bus_off;
+
     if (_serport->isOpen())
     {
         // Close CAN port
-        _serport->write("C\r", 2);        
+        _serport->write("C\r", 2);
         _serport->flush();
         _serport->waitForBytesWritten(300);
         _serport->waitForReadyRead(10);
@@ -448,8 +525,8 @@ void SLCANInterface::close()
         _serport->close();
     }
 
-    _isOpen = false;
-    _status.can_state = state_bus_off;
+    _can_msg_queue.clear();
+
     _serport_mutex.unlock();
 }
 
@@ -459,9 +536,9 @@ bool SLCANInterface::isOpen()
 }
 
 void SLCANInterface::sendMessage(const CanMessage &msg) {
-
+    _serport_mutex.lock();
     // SLCAN_MTU plus null terminator
-    char buf[SLCAN_MTU+1] = {0};
+    can_msg_t can_msg;
 
     uint8_t msg_idx = 0;
 
@@ -471,12 +548,12 @@ void SLCANInterface::sendMessage(const CanMessage &msg) {
     {
         if(msg.isBRS())
         {
-            buf[msg_idx] = 'b';
+            can_msg.buf[msg_idx] = 'b';
 
         }
         else
         {
-            buf[msg_idx] = 'd';
+            can_msg.buf[msg_idx] = 'd';
         }
     }
 
@@ -485,11 +562,11 @@ void SLCANInterface::sendMessage(const CanMessage &msg) {
     else
     {
         if (msg.isRTR()) {
-            buf[msg_idx] = 'r';
+            can_msg.buf[msg_idx] = 'r';
         }
         else
         {
-            buf[msg_idx] = 't';
+            can_msg.buf[msg_idx] = 't';
         }
     }
 
@@ -501,7 +578,7 @@ void SLCANInterface::sendMessage(const CanMessage &msg) {
     if (msg.isExtended())
     {
         // Convert first char to upper case for extended frame
-        buf[msg_idx] -= 32;
+        can_msg.buf[msg_idx] -= 32;
         id_len = SLCAN_EXT_ID_LEN;
     }
     msg_idx++;
@@ -510,7 +587,7 @@ void SLCANInterface::sendMessage(const CanMessage &msg) {
     for(uint8_t j = id_len; j > 0; j--)
     {
         // Add nibble to buffer
-        buf[j] = (tmp & 0xF);
+        can_msg.buf[j] = (tmp & 0xF);
         tmp = tmp >> 4;
         msg_idx++;
     }
@@ -554,32 +631,36 @@ void SLCANInterface::sendMessage(const CanMessage &msg) {
     }
 
     // Add DLC to buffer
-    buf[msg_idx++] = bytes;
+    can_msg.buf[msg_idx++] = bytes;
 
     // Add data bytes
     for (uint8_t j = 0; j < msg.getLength(); j++)
     {
-        buf[msg_idx++] = (msg.getByte(j) >> 4);
-        buf[msg_idx++] = (msg.getByte(j) & 0x0F);
+        can_msg.buf[msg_idx++] = (msg.getByte(j) >> 4);
+        can_msg.buf[msg_idx++] = (msg.getByte(j) & 0x0F);
     }
 
     // Convert to ASCII (2nd character to end)
     for (uint8_t j = 1; j < msg_idx; j++)
     {
-        if (buf[j] < 0xA) {
-            buf[j] += 0x30;
+        if (can_msg.buf[j] < 0xA) {
+            can_msg.buf[j] += 0x30;
         } else {
-            buf[j] += 0x37;
+            can_msg.buf[j] += 0x37;
         }
     }
 
     // Add CR for slcan EOL
-    buf[msg_idx++] = '\r';
+    can_msg.buf[msg_idx++] = '\r';
 
     // Ensure null termination
-    buf[msg_idx] = '\0';
+    can_msg.buf[msg_idx] = '\0';
 
-    _msg_queue.append(QString(buf));
+    can_msg.length = msg_idx;
+
+    _can_msg_queue.append(can_msg);
+
+    _serport_mutex.unlock();
 
 }
 
@@ -617,15 +698,24 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
     }
 
     // Transmit all items that are queued
-    while(!_msg_queue.empty())
-    {
-        // Consume first item
-        QString tmp = _msg_queue.front();
-        _msg_queue.pop_front();
+    can_msg_t tmp;
 
-        _serport_mutex.lock();
+    QList<can_msg_t>::iterator it;
+    _serport_mutex.lock();
+    for(it = _can_msg_queue.begin(); it<_can_msg_queue.end();it++)
+    {
+        if(_can_msg_queue.empty())
+        {
+            std::cout << "msg empty1" << std::endl;
+            break;
+        }
+
+        // Consume first item
+        tmp = _can_msg_queue.front();
+        _can_msg_queue.pop_front();
+
         // Write string to serial device
-        if(_serport->write(tmp.toStdString().c_str(), tmp.length())==tmp.length())
+        if(_serport->write(tmp.buf, tmp.length)==tmp.length)
         {
             _send_wait_respond ++;
             _readMessage_datetime = QDateTime::currentDateTime();
@@ -635,40 +725,49 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
             _status.tx_errors ++;
             _send_wait_respond = 0;
         }
+
         //_serport->flush();
         _serport->waitForBytesWritten(300);
-        _serport_mutex.unlock();
+
+        if(it >= _can_msg_queue.end())
+        {
+            std::cout << "msg empty" << std::endl;
+            //_can_msg_queue.clear();
+            break;
+        }
     }
+    _serport_mutex.unlock();
 
     // RX doesn't work on windows unless we call this for some reason
-    if(_serport->waitForReadyRead(1))
+    _rxbuf_mutex.lock();
+    if(_serport->waitForReadyRead(0))
     {
-        //qApp->processEvents();
-    }
+        qApp->processEvents();
 
-    if(_serport->bytesAvailable())
-    {
-        // This is called when readyRead() is emitted
-        QByteArray datas = _serport->readAll();
-
-        _rxbuf_mutex.lock();
-        for(int i=0; i<datas.count(); i++)
+        if(_serport->bytesAvailable())
         {
-            // If incrementing the head will hit the tail, we've filled the buffer. Reset and discard all data.
-            if(((_rxbuf_head + 1) % RXCIRBUF_LEN) == _rxbuf_tail)
+            // This is called when readyRead() is emitted
+            QByteArray datas = _serport->readAll();
+
+            for(int i=0; i<datas.count(); i++)
             {
-                _rxbuf_head = 0;
-                _rxbuf_tail = 0;
+                // If incrementing the head will hit the tail, we've filled the buffer. Reset and discard all data.
+                if(((_rxbuf_head + 1) % RXCIRBUF_LEN) == _rxbuf_tail)
+                {
+                    _rxbuf_head = 0;
+                    _rxbuf_tail = 0;
+                }
+                else
+                {
+                    // Put inbound data at the head locatoin
+                    _rxbuf[_rxbuf_head] = datas.at(i);
+                    _rxbuf_head = (_rxbuf_head + 1) % RXCIRBUF_LEN; // Wrap at MTU
+                }
             }
-            else
-            {
-                // Put inbound data at the head locatoin
-                _rxbuf[_rxbuf_head] = datas.at(i);
-                _rxbuf_head = (_rxbuf_head + 1) % RXCIRBUF_LEN; // Wrap at MTU
-            }
+
         }
-        _rxbuf_mutex.unlock();
     }
+    _rxbuf_mutex.unlock();
 
     //////////////////////////
 

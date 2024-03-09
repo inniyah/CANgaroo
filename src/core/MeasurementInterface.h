@@ -72,6 +72,17 @@ public:
     int autoRestartMs() const;
     void setAutoRestartMs(int autoRestartMs);
 
+    bool isCustomBitrate() const;
+    void setCustomBitrateEn(bool customBitrate);
+
+    bool isCustomFdBitrate() const;
+    void setCustomFdBitrateEn(bool customFdBitrate);
+
+    uint16_t customBitrate() const;
+    void setCustomBitrate(uint16_t customBitrate);
+
+    uint16_t customFdBitrate() const;
+    void setCustomFdBitrate(uint16_t customFdBitrate);
 private:
     CanInterfaceId _canif;
 
@@ -89,4 +100,10 @@ private:
     bool _isTripleSampling;
     bool _doAutoRestart;
     int _autoRestartMs;
+
+    bool _isCustomBitrate;
+    bool _isCustomFdBitrate;
+
+    uint16_t _CustomBitrate;
+    uint16_t _CustomFdBitrate;
 };

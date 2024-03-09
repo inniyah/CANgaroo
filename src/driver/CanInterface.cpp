@@ -24,7 +24,7 @@
 #include <QList>
 
 CanInterface::CanInterface(CanDriver *driver)
-  : _id(-1), _driver(driver)
+  :QObject(0), _id(-1), _driver(driver)
 {
 }
 

@@ -59,7 +59,13 @@ typedef struct {
     uint64_t tx_dropped;
 } can_status_t;
 
+typedef struct {
+    char buf[SLCAN_MTU+1];
+    qint64 length;
+} can_msg_t;
+
 class SLCANInterface: public CanInterface {
+    Q_OBJECT
 public:
     enum {
         CANable,
@@ -117,7 +123,7 @@ private:
     bool _isOpen;
     bool _isOffline;
     QSerialPort* _serport;
-    QStringList _msg_queue;
+    QList<can_msg_t> _can_msg_queue;
     QMutex _serport_mutex;
     QString _name;
     char _rx_linbuf[SLCAN_MTU+1];
@@ -141,5 +147,6 @@ private:
     bool updateStatus();
     bool parseMessage(CanMessage &msg);
 
+private slots:
     void handleSerialError(QSerialPort::SerialPortError error);
 };

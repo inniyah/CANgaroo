@@ -38,7 +38,13 @@ MeasurementInterface::MeasurementInterface()
     _isOneShotMode(false),
     _isTripleSampling(false),
     _doAutoRestart(false),
-    _autoRestartMs(100)
+    _autoRestartMs(100),
+
+    _isCustomBitrate(false),
+    _isCustomFdBitrate(false),
+
+    _CustomBitrate(0x3407),
+    _CustomFdBitrate(0x1508)
 {
 
 }
@@ -61,6 +67,11 @@ bool MeasurementInterface::loadXML(Backend &backend, QDomElement &el)
     _doAutoRestart = el.attribute("auto-restart", "0").toInt() != 0;
     _autoRestartMs = el.attribute("auto-restart-time", "100").toInt();
 
+    _isCustomBitrate = el.attribute("is-custom-bitrate", "0").toInt() != 0;
+    _isCustomFdBitrate = el.attribute("is-custom-fdbitrate", "0").toInt() != 0;
+
+    _CustomBitrate = el.attribute("custom-bitrate", "0").toInt();
+    _CustomFdBitrate = el.attribute("custom-fdbitrate", "0").toInt();
     return true;
 }
 
@@ -86,6 +97,11 @@ bool MeasurementInterface::saveXML(Backend &backend, QDomDocument &xml, QDomElem
     root.setAttribute("auto-restart", _doAutoRestart ? 1 : 0);
     root.setAttribute("auto-restart-time", _autoRestartMs);
 
+    root.setAttribute("is-custom-bitrate", _isCustomBitrate ? 1 : 0);
+    root.setAttribute("is-custom-fdbitrate", _isCustomFdBitrate ? 1 : 0);
+
+    root.setAttribute("custom-bitrate", _CustomBitrate);
+    root.setAttribute("custom-fdbitrate", _CustomFdBitrate);
     return true;
 }
 
@@ -212,4 +228,44 @@ int MeasurementInterface::autoRestartMs() const
 void MeasurementInterface::setAutoRestartMs(int autoRestartMs)
 {
     _autoRestartMs = autoRestartMs;
+}
+
+bool MeasurementInterface::isCustomBitrate() const
+{
+    return _isCustomBitrate;
+}
+
+void MeasurementInterface::setCustomBitrateEn(bool customBitrate)
+{
+    _isCustomBitrate = customBitrate;
+}
+
+bool MeasurementInterface::isCustomFdBitrate() const
+{
+    return _isCustomFdBitrate;
+}
+
+void MeasurementInterface::setCustomFdBitrateEn(bool customFdBitrate)
+{
+    _isCustomFdBitrate = customFdBitrate;
+}
+
+uint16_t MeasurementInterface::customBitrate() const
+{
+    return _CustomBitrate;
+}
+
+void MeasurementInterface::setCustomBitrate(uint16_t customBitrate)
+{
+    _CustomBitrate = customBitrate;
+}
+
+uint16_t MeasurementInterface::customFdBitrate() const
+{
+    return _CustomFdBitrate;
+}
+
+void MeasurementInterface::setCustomFdBitrate(uint16_t customFdBitrate)
+{
+    _CustomFdBitrate = customFdBitrate;
 }

@@ -442,6 +442,7 @@ bool MainWindow::showSetupDialog()
         if(!_setupDlg->isReflashNetworks())
             backend().setSetup(new_setup);
         setWorkspaceModified(true);
+        _showSetupDialog_first = true;
         return true;
     } else {
         return false;

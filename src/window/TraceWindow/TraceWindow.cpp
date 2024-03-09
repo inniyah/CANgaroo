@@ -85,6 +85,9 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     connect(ui->filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(on_cbFilterChanged()));
 
     connect(ui->TraceClearpushButton, SIGNAL(released()), this, SLOT(on_cbTraceClearpushButton()));
+
+    ui->cbAggregated->setCheckState(Qt::Unchecked);
+    ui->cbAutoScroll->setCheckState(Qt::Checked);
 }
 
 TraceWindow::~TraceWindow()
@@ -193,10 +196,14 @@ void TraceWindow::rowsInserted(const QModelIndex &parent, int first, int last)
     (void) first;
     (void) last;
 
+    if(_backend->getTrace()->size() > 1000000)
+    {
+        _backend->clearTrace();
+    }
+
     if ((_mode==mode_linear) && (ui->cbAutoScroll->checkState() == Qt::Checked)) {
         ui->tree->scrollToBottom();
     }
-
 }
 
 void TraceWindow::on_cbAggregated_stateChanged(int i)

@@ -25,11 +25,7 @@
 #include <core/Backend.h>
 #include <driver/GenericCanSetupPage.h>
 
-#include <errno.h>
-#include <cstring>
-#include <stdio.h>
 #include <unistd.h>
-#include <string.h>
 #include <iostream>
 
 #include <QCoreApplication>
@@ -64,7 +60,7 @@ bool SLCANDriver::update() {
 
             // Create new slcan interface without FD support
             _manufacturer = SLCANInterface::CANable;
-            SLCANInterface *intf = createOrUpdateInterface(interface_cnt, info.portName(), false, _manufacturer);
+            createOrUpdateInterface(interface_cnt, info.portName(), false, _manufacturer);
             interface_cnt++;
         }
         else if(info.vendorIdentifier() == 0x16D0 && info.productIdentifier() == 0x117E)
@@ -73,7 +69,7 @@ bool SLCANDriver::update() {
 
             _manufacturer = SLCANInterface::CANable;
             // Create new slcan interface with FD support
-            SLCANInterface *intf = createOrUpdateInterface(interface_cnt, info.portName(), true, _manufacturer);
+            createOrUpdateInterface(interface_cnt, info.portName(), true, _manufacturer);
             interface_cnt++;
         }
         else if(info.vendorIdentifier() == 1155 && info.productIdentifier() == 22336 && info.serialNumber().startsWith("AAA"))
@@ -83,7 +79,7 @@ bool SLCANDriver::update() {
 
             _manufacturer = SLCANInterface::WeActStudio;
             // Create new slcan interface with FD support
-            SLCANInterface *intf = createOrUpdateInterface(interface_cnt, info.portName(), true, _manufacturer);
+            createOrUpdateInterface(interface_cnt, info.portName(), true, _manufacturer);
             interface_cnt++;
         }
         else
@@ -109,7 +105,6 @@ SLCANInterface *SLCANDriver::createOrUpdateInterface(int index, QString name, bo
             return scif;
 		}
 	}
-
 
     SLCANInterface *scif = new SLCANInterface(this, index, name, fd_support, manufacturer);
     addInterface(scif);

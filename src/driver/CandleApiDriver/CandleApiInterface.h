@@ -14,6 +14,7 @@ using namespace std;
 
 class CandleApiInterface : public CanInterface
 {
+    Q_OBJECT
 public:
     CandleApiInterface(CandleApiDriver *driver, candle_handle handle);
     virtual ~CandleApiInterface();
