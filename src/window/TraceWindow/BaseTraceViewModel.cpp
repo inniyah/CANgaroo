@@ -48,6 +48,8 @@ QVariant BaseTraceViewModel::headerData(int section, Qt::Orientation orientation
 
         if (orientation == Qt::Horizontal) {
             switch (section) {
+                case column_index:
+                    return QString("Index");
                 case column_timestamp:
                     return QString("Timestamp");
                 case column_channel:
@@ -71,6 +73,22 @@ QVariant BaseTraceViewModel::headerData(int section, Qt::Orientation orientation
             }
         }
 
+    }
+    else if (role == Qt::TextAlignmentRole) {
+        switch (section) {
+            case column_index: return Qt::AlignCenter + Qt::AlignVCenter;
+            case column_timestamp: return Qt::AlignCenter + Qt::AlignVCenter;
+            case column_channel: return Qt::AlignCenter + Qt::AlignVCenter;
+            case column_direction: return Qt::AlignCenter + Qt::AlignVCenter;
+            case column_type: return Qt::AlignCenter + Qt::AlignVCenter;
+            case column_canid: return Qt::AlignCenter + Qt::AlignVCenter;
+            case column_sender: return Qt::AlignLeft + Qt::AlignVCenter;
+            case column_name: return Qt::AlignLeft + Qt::AlignVCenter;
+            case column_dlc: return Qt::AlignCenter + Qt::AlignVCenter;
+            case column_data: return Qt::AlignLeft + Qt::AlignVCenter;
+            case column_comment: return Qt::AlignLeft + Qt::AlignVCenter;
+            default: return QVariant();
+        }
     }
     return QVariant();
 }
@@ -169,6 +187,9 @@ QVariant BaseTraceViewModel::data_DisplayRole_Message(const QModelIndex &index, 
 
     switch (index.column()) {
 
+        case column_index:
+            return index.internalId();
+
         case column_timestamp:
             return formatTimestamp(_timestampMode, currentMsg, lastMsg);
 
@@ -261,6 +282,7 @@ QVariant BaseTraceViewModel::data_TextAlignmentRole(const QModelIndex &index, in
 {
     (void) role;
     switch (index.column()) {
+        case column_index: return Qt::AlignCenter + Qt::AlignVCenter;
         case column_timestamp: return Qt::AlignRight + Qt::AlignVCenter;
         case column_channel: return Qt::AlignCenter + Qt::AlignVCenter;
         case column_direction: return Qt::AlignCenter + Qt::AlignVCenter;

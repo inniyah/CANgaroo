@@ -30,10 +30,15 @@ LogWindow::LogWindow(QWidget *parent, Backend &backend) :
     ConfigurableWidget(parent),
     ui(new Ui::LogWindow)
 {
+    ui->setupUi(this);
+
     connect(&backend.getLogModel(), SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(rowsInserted(QModelIndex,int,int)));
 
-    ui->setupUi(this);
     ui->treeView->setModel(&backend.getLogModel());
+
+    _scroll_timer.setInterval(1);
+    _scroll_timer.setSingleShot(true);
+    connect(&_scroll_timer,SIGNAL(timeout()),this,SLOT(_scroll_timer_timeout()));
 }
 
 LogWindow::~LogWindow()
@@ -58,5 +63,12 @@ void LogWindow::rowsInserted(const QModelIndex &parent, int first, int last)
     (void) parent;
     (void) first;
     (void) last;
+
+    _scroll_timer.start();
+    //ui->treeView->scrollToBottom();
+}
+
+void LogWindow::_scroll_timer_timeout()
+{
     ui->treeView->scrollToBottom();
 }

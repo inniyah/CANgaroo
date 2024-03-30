@@ -718,13 +718,9 @@
     </message>
     <message>
         <location filename="window/TraceWindow/TraceWindow.ui" line="85"/>
-        <source>CAN ID Filter: </source>
-        <translation type="unfinished">CAN ID过滤器:</translation>
-    </message>
-    <message>
-        <location filename="window/TraceWindow/TraceWindow.ui" line="98"/>
-        <source>CAN ID(hex)</source>
-        <translation type="unfinished"></translation>
+        <source>Filter: </source>
+        <oldsource>CAN ID Filter: </oldsource>
+        <translation type="unfinished">过滤器:</translation>
     </message>
 </context>
 </TS>

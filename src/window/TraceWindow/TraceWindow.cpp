@@ -63,7 +63,8 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     ui->tree->setAlternatingRowColors(true);
 
     ui->tree->setUniformRowHeights(true);
-    ui->tree->setColumnWidth(BaseTraceViewModel::column_timestamp, 120);
+    ui->tree->setColumnWidth(BaseTraceViewModel::column_index, 70);
+    ui->tree->setColumnWidth(BaseTraceViewModel::column_timestamp, 100);
     ui->tree->setColumnWidth(BaseTraceViewModel::column_channel, 70);
     ui->tree->setColumnWidth(BaseTraceViewModel::column_direction, 50);
     ui->tree->setColumnWidth(BaseTraceViewModel::column_type, 80);
@@ -71,9 +72,9 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     ui->tree->setColumnWidth(BaseTraceViewModel::column_sender, 150);
     ui->tree->setColumnWidth(BaseTraceViewModel::column_name, 150);
     ui->tree->setColumnWidth(BaseTraceViewModel::column_dlc, 50);
-    ui->tree->setColumnWidth(BaseTraceViewModel::column_data, 300);
+    ui->tree->setColumnWidth(BaseTraceViewModel::column_data, 250);
     ui->tree->setColumnWidth(BaseTraceViewModel::column_comment, 90);
-    ui->tree->sortByColumn(BaseTraceViewModel::column_canid, Qt::AscendingOrder);
+    ui->tree->sortByColumn(BaseTraceViewModel::column_index, Qt::AscendingOrder);
 
     ui->cbTimestampMode->addItem("absolute", 0);
     ui->cbTimestampMode->addItem("relative", 1);
@@ -85,6 +86,9 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     connect(ui->filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(on_cbFilterChanged()));
 
     connect(ui->TraceClearpushButton, SIGNAL(released()), this, SLOT(on_cbTraceClearpushButton()));
+
+    connect(ui->cbAggregated,SIGNAL(stateChanged(int)),this,SLOT(on_cbAggregated_stateChanged(int)));
+    connect(ui->cbAutoScroll,SIGNAL(stateChanged(int)),this,SLOT(on_cbAutoScroll_stateChanged(int)));
 
     ui->cbAggregated->setCheckState(Qt::Unchecked);
     ui->cbAutoScroll->setCheckState(Qt::Checked);
@@ -106,11 +110,15 @@ void TraceWindow::setMode(TraceWindow::mode_t mode)
         ui->tree->setSortingEnabled(false);
         ui->tree->setModel(_linFilteredModel); //_linearTraceViewModel);
         ui->cbAutoScroll->setEnabled(true);
+        ui->tree->sortByColumn(BaseTraceViewModel::column_index, Qt::AscendingOrder);
     } else {
         ui->tree->setSortingEnabled(true);
         ui->tree->setModel(_aggFilteredModel); //_aggregatedProxyModel);
         ui->cbAutoScroll->setEnabled(false);
+        ui->tree->sortByColumn(BaseTraceViewModel::column_canid, Qt::AscendingOrder);
     }
+
+    ui->tree->scrollToBottom();
 
     if (isChanged) {
         ui->cbAggregated->setChecked(_mode==mode_aggregated);
@@ -185,7 +193,8 @@ bool TraceWindow::loadXML(Backend &backend, QDomElement &el)
 
     QDomElement elAggregated = el.firstChildElement("AggregatedTraceView");
     int sortColumn = elAggregated.attribute("SortColumn", "-1").toInt();
-    ui->tree->sortByColumn(sortColumn);
+    ui->tree->sortByColumn(sortColumn,Qt::SortOrder::AscendingOrder);
+    //ui->tree->sortByColumn(sortColumn);
 
     return true;
 }

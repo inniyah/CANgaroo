@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>281</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,14 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QTreeView" name="treeView"/>
+    <widget class="QTreeView" name="treeView">
+     <property name="autoScroll">
+      <bool>true</bool>
+     </property>
+     <property name="autoScrollMargin">
+      <number>16</number>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

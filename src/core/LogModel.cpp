@@ -150,7 +150,7 @@ void LogModel::onLogMessage(const QDateTime dt, const log_level_t level, const Q
     item->level = level;
     item->text = msg;
 
-    beginInsertRows(QModelIndex(), _items.size()-1, _items.size());
+    beginInsertRows(QModelIndex(), _items.size(), _items.size());
     _items.append(item);
     endInsertRows();
 }

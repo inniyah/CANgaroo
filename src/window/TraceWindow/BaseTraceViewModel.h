@@ -35,6 +35,7 @@ class BaseTraceViewModel : public QAbstractItemModel
 
 public:
     enum {
+        column_index,
         column_timestamp,
         column_channel,
         column_direction,

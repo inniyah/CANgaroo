@@ -82,12 +82,18 @@
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>CAN ID Filter: </string>
+         <string>Filter: </string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLineEdit" name="filterLineEdit">
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
+         </size>
+        </property>
         <property name="toolTip">
          <string/>
         </property>
@@ -95,7 +101,7 @@
          <string/>
         </property>
         <property name="placeholderText">
-         <string>CAN ID(hex)</string>
+         <string/>
         </property>
        </widget>
       </item>
