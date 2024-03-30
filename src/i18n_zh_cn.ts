@@ -1066,7 +1066,7 @@
     <message>
         <location filename="window/TraceWindow/TraceWindow.cpp" line="81"/>
         <source>delta</source>
-        <translation type="unfinished">时间差</translation>
+        <translation type="unfinished">相对差</translation>
     </message>
 </context>
 </TS>
