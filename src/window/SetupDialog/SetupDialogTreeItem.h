@@ -24,6 +24,8 @@
 #include <QList>
 #include <QVariant>
 
+#include <QObject>
+
 #include <core/Backend.h>
 #include <core/MeasurementSetup.h>
 #include <core/MeasurementNetwork.h>

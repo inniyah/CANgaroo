@@ -2,11 +2,175 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
+    <name>Backend</name>
+    <message>
+        <location filename="core/Backend.cpp" line="73"/>
+        <source>Starting measurement</source>
+        <translation type="unfinished">开始测量</translation>
+    </message>
+    <message>
+        <location filename="core/Backend.cpp" line="87"/>
+        <source>Listening on interface: %1</source>
+        <translation type="unfinished">监听接口: %1</translation>
+    </message>
+    <message>
+        <location filename="core/Backend.cpp" line="108"/>
+        <source>Closing interface: %1</source>
+        <translation type="unfinished">关闭接口: %1</translation>
+    </message>
+    <message>
+        <location filename="core/Backend.cpp" line="115"/>
+        <source>Measurement stopped</source>
+        <translation type="unfinished">测量停止</translation>
+    </message>
+    <message>
+        <location filename="core/Backend.cpp" line="138"/>
+        <source>Network </source>
+        <translation type="unfinished">网络 </translation>
+    </message>
+</context>
+<context>
+    <name>BaseTraceViewModel</name>
+    <message>
+        <location filename="window/TraceWindow/BaseTraceViewModel.cpp" line="52"/>
+        <source>Index</source>
+        <translation type="unfinished">序号</translation>
+    </message>
+    <message>
+        <location filename="window/TraceWindow/BaseTraceViewModel.cpp" line="54"/>
+        <source>Timestamp</source>
+        <translation type="unfinished">时间戳</translation>
+    </message>
+    <message>
+        <location filename="window/TraceWindow/BaseTraceViewModel.cpp" line="56"/>
+        <source>Channel</source>
+        <translation type="unfinished">通道</translation>
+    </message>
+    <message>
+        <location filename="window/TraceWindow/BaseTraceViewModel.cpp" line="58"/>
+        <source>Rx/Tx</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="window/TraceWindow/BaseTraceViewModel.cpp" line="60"/>
+        <source>Type</source>
+        <translation type="unfinished">类型</translation>
+    </message>
+    <message>
+        <location filename="window/TraceWindow/BaseTraceViewModel.cpp" line="64"/>
+        <source>Sender</source>
+        <translation type="unfinished">报文名称</translation>
+    </message>
+    <message>
+        <location filename="window/TraceWindow/BaseTraceViewModel.cpp" line="66"/>
+        <source>Name</source>
+        <translation type="unfinished">报文内容</translation>
+    </message>
+    <message>
+        <location filename="window/TraceWindow/BaseTraceViewModel.cpp" line="70"/>
+        <source>Data</source>
+        <translation type="unfinished">原始数据</translation>
+    </message>
+    <message>
+        <location filename="window/TraceWindow/BaseTraceViewModel.cpp" line="72"/>
+        <source>Comment</source>
+        <translation type="unfinished">注释</translation>
+    </message>
+</context>
+<context>
+    <name>CanInterface</name>
+    <message>
+        <location filename="driver/CanInterface.cpp" line="83"/>
+        <source>ready</source>
+        <translation type="unfinished">良好</translation>
+    </message>
+    <message>
+        <location filename="driver/CanInterface.cpp" line="84"/>
+        <source>warning</source>
+        <translation type="unfinished">警告</translation>
+    </message>
+    <message>
+        <location filename="driver/CanInterface.cpp" line="85"/>
+        <source>error passive</source>
+        <translation type="unfinished">被动错误</translation>
+    </message>
+    <message>
+        <location filename="driver/CanInterface.cpp" line="86"/>
+        <source>bus off</source>
+        <translation type="unfinished">总线关闭</translation>
+    </message>
+    <message>
+        <location filename="driver/CanInterface.cpp" line="87"/>
+        <source>stopped</source>
+        <translation type="unfinished">已停止</translation>
+    </message>
+    <message>
+        <location filename="driver/CanInterface.cpp" line="88"/>
+        <source>unknown</source>
+        <translation type="unfinished">未知</translation>
+    </message>
+    <message>
+        <location filename="driver/CanInterface.cpp" line="89"/>
+        <source>tx success</source>
+        <translation type="unfinished">发送成功</translation>
+    </message>
+    <message>
+        <location filename="driver/CanInterface.cpp" line="90"/>
+        <source>tx fail</source>
+        <translation type="unfinished">发送失败</translation>
+    </message>
+</context>
+<context>
     <name>CanStatusWindow</name>
     <message>
         <location filename="window/CanStatusWindow/CanStatusWindow.ui" line="14"/>
         <source>Can Status</source>
         <translation type="unfinished">CAN 状态</translation>
+    </message>
+    <message>
+        <location filename="window/CanStatusWindow/CanStatusWindow.cpp" line="41"/>
+        <source>Driver</source>
+        <translation type="unfinished">驱动</translation>
+    </message>
+    <message>
+        <location filename="window/CanStatusWindow/CanStatusWindow.cpp" line="41"/>
+        <source>Interface</source>
+        <translation type="unfinished">接口</translation>
+    </message>
+    <message>
+        <location filename="window/CanStatusWindow/CanStatusWindow.cpp" line="41"/>
+        <source>State</source>
+        <translation type="unfinished">状态</translation>
+    </message>
+    <message>
+        <location filename="window/CanStatusWindow/CanStatusWindow.cpp" line="42"/>
+        <source>Rx Frames</source>
+        <translation type="unfinished">接收帧</translation>
+    </message>
+    <message>
+        <location filename="window/CanStatusWindow/CanStatusWindow.cpp" line="42"/>
+        <source>Rx Errors</source>
+        <translation type="unfinished">接收错误</translation>
+    </message>
+    <message>
+        <location filename="window/CanStatusWindow/CanStatusWindow.cpp" line="42"/>
+        <source>Rx Overrun</source>
+        <translation type="unfinished">接收溢出</translation>
+    </message>
+    <message>
+        <location filename="window/CanStatusWindow/CanStatusWindow.cpp" line="43"/>
+        <source>Tx Frames</source>
+        <translation type="unfinished">发送帧</translation>
+    </message>
+    <message>
+        <location filename="window/CanStatusWindow/CanStatusWindow.cpp" line="43"/>
+        <source>Tx Errors</source>
+        <translation type="unfinished">发送错误</translation>
+    </message>
+    <message>
+        <location filename="window/CanStatusWindow/CanStatusWindow.cpp" line="43"/>
+        <source>Tx Dropped</source>
+        <translation type="unfinished">发送溢出</translation>
     </message>
 </context>
 <context>
@@ -134,12 +298,60 @@
     <message>
         <location filename="window/GraphWindow/GraphWindow.ui" line="26"/>
         <source>Graph</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">图表</translation>
     </message>
     <message>
         <location filename="window/GraphWindow/GraphWindow.ui" line="54"/>
         <source>Test</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LogModel</name>
+    <message>
+        <location filename="core/LogModel.cpp" line="82"/>
+        <source>Time</source>
+        <translation type="unfinished">时间</translation>
+    </message>
+    <message>
+        <location filename="core/LogModel.cpp" line="84"/>
+        <source>Level</source>
+        <translation type="unfinished">级别</translation>
+    </message>
+    <message>
+        <location filename="core/LogModel.cpp" line="86"/>
+        <source>Message</source>
+        <translation type="unfinished">信息</translation>
+    </message>
+    <message>
+        <location filename="core/LogModel.cpp" line="174"/>
+        <source>debug</source>
+        <translation type="unfinished">调试</translation>
+    </message>
+    <message>
+        <location filename="core/LogModel.cpp" line="175"/>
+        <source>info</source>
+        <translation type="unfinished">信息</translation>
+    </message>
+    <message>
+        <location filename="core/LogModel.cpp" line="176"/>
+        <source>warning</source>
+        <translation type="unfinished">警告</translation>
+    </message>
+    <message>
+        <location filename="core/LogModel.cpp" line="177"/>
+        <source>error</source>
+        <translation type="unfinished">错误</translation>
+    </message>
+    <message>
+        <location filename="core/LogModel.cpp" line="178"/>
+        <source>critical</source>
+        <translation type="unfinished">重要</translation>
+    </message>
+    <message>
+        <location filename="core/LogModel.cpp" line="179"/>
+        <source>fatal</source>
+        <translation type="unfinished">致命</translation>
     </message>
 </context>
 <context>
@@ -256,12 +468,12 @@
     <message>
         <location filename="mainwindow.ui" line="191"/>
         <source>&amp;Save Trace to file...</source>
-        <translation type="unfinished">&amp;保存跟踪到文件</translation>
+        <translation type="unfinished">&amp;保存跟踪到文件...</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="199"/>
         <source>&amp;Graph View</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&amp;图表视图</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="202"/>
@@ -291,7 +503,7 @@
     <message>
         <location filename="mainwindow.ui" line="226"/>
         <source>Save Workspace &amp;As...</source>
-        <translation type="unfinished">另存工作空间为...</translation>
+        <translation type="unfinished">&amp;另存工作空间为...</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="229"/>
@@ -326,12 +538,98 @@
     <message>
         <location filename="mainwindow.ui" line="255"/>
         <source>Graph View</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">图表视图</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="260"/>
+        <location filename="mainwindow.cpp" line="396"/>
         <source>Transmit View</source>
         <translation type="unfinished">发送视图</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="284"/>
+        <source>Open workspace configuration</source>
+        <translation type="unfinished">打开工作空间配置文件</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="284"/>
+        <location filename="mainwindow.cpp" line="302"/>
+        <source>Workspace config files (*.cangaroo)</source>
+        <translation type="unfinished">工作空间配置文件(*.cangaroo)</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="302"/>
+        <source>Save workspace configuration</source>
+        <translation type="unfinished">保存工作空间配置文件</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="329"/>
+        <source>The current workspace has been modified.</source>
+        <translation type="unfinished">当前工作空间已被改动。</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="330"/>
+        <source>Do you want to save your changes?</source>
+        <translation type="unfinished">是否要保存改动？</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="333"/>
+        <source>Save</source>
+        <translation type="unfinished">保存</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="334"/>
+        <source>Discard</source>
+        <translation type="unfinished">放弃</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="335"/>
+        <source>Cancel</source>
+        <translation type="unfinished">取消</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="355"/>
+        <source>Trace</source>
+        <translation type="unfinished">跟踪</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="372"/>
+        <location filename="mainwindow.cpp" line="386"/>
+        <source>Graph</source>
+        <translation type="unfinished">图表</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="408"/>
+        <source>Log</source>
+        <translation type="unfinished">日志</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="420"/>
+        <source>CAN Status</source>
+        <translation type="unfinished">CAN状态</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="458"/>
+        <source>About cangaroo</source>
+        <translation type="unfinished">关于cangaroo</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="window/SetupDialog/SetupDialogTreeItem.cpp" line="103"/>
+        <source>Setup</source>
+        <translation type="unfinished">设置</translation>
+    </message>
+    <message>
+        <location filename="window/SetupDialog/SetupDialogTreeItem.cpp" line="105"/>
+        <source>Interfaces</source>
+        <translation type="unfinished">接口</translation>
+    </message>
+    <message>
+        <location filename="window/SetupDialog/SetupDialogTreeItem.cpp" line="107"/>
+        <source>Can Databases</source>
+        <translation type="unfinished">CAN数据库</translation>
     </message>
 </context>
 <context>
@@ -374,7 +672,7 @@
     <message>
         <location filename="window/RawTxWindow/RawTxWindow.ui" line="165"/>
         <source>RTR</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">远程帧</translation>
     </message>
     <message>
         <location filename="window/RawTxWindow/RawTxWindow.ui" line="178"/>
@@ -628,7 +926,7 @@
     <message>
         <location filename="window/SetupDialog/SelectCanInterfacesDialog.ui" line="82"/>
         <source>&amp;Create Interface...</source>
-        <translation type="unfinished">创建接口</translation>
+        <translation type="unfinished">&amp;创建接口...</translation>
     </message>
 </context>
 <context>
@@ -690,11 +988,44 @@
     </message>
 </context>
 <context>
+    <name>SetupDialogTreeModel</name>
+    <message>
+        <location filename="window/SetupDialog/SetupDialogTreeModel.cpp" line="59"/>
+        <source>Device</source>
+        <translation type="unfinished">设备</translation>
+    </message>
+    <message>
+        <location filename="window/SetupDialog/SetupDialogTreeModel.cpp" line="60"/>
+        <source>Driver</source>
+        <translation type="unfinished">驱动</translation>
+    </message>
+    <message>
+        <location filename="window/SetupDialog/SetupDialogTreeModel.cpp" line="61"/>
+        <source>Bitrate</source>
+        <translation type="unfinished">波特率</translation>
+    </message>
+    <message>
+        <location filename="window/SetupDialog/SetupDialogTreeModel.cpp" line="62"/>
+        <source>Filename</source>
+        <translation type="unfinished">文件名</translation>
+    </message>
+    <message>
+        <location filename="window/SetupDialog/SetupDialogTreeModel.cpp" line="63"/>
+        <source>Path</source>
+        <translation type="unfinished">路径</translation>
+    </message>
+    <message>
+        <location filename="window/SetupDialog/SetupDialogTreeModel.cpp" line="120"/>
+        <source>Network </source>
+        <translation type="unfinished">网络 </translation>
+    </message>
+</context>
+<context>
     <name>TraceWindow</name>
     <message>
         <location filename="window/TraceWindow/TraceWindow.ui" line="14"/>
         <source>Trace View</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">跟踪视图</translation>
     </message>
     <message>
         <location filename="window/TraceWindow/TraceWindow.ui" line="35"/>
@@ -720,7 +1051,22 @@
         <location filename="window/TraceWindow/TraceWindow.ui" line="85"/>
         <source>Filter: </source>
         <oldsource>CAN ID Filter: </oldsource>
-        <translation type="unfinished">过滤器:</translation>
+        <translation type="unfinished">过滤器: </translation>
+    </message>
+    <message>
+        <location filename="window/TraceWindow/TraceWindow.cpp" line="79"/>
+        <source>absolute</source>
+        <translation type="unfinished">绝对</translation>
+    </message>
+    <message>
+        <location filename="window/TraceWindow/TraceWindow.cpp" line="80"/>
+        <source>relative</source>
+        <translation type="unfinished">相对</translation>
+    </message>
+    <message>
+        <location filename="window/TraceWindow/TraceWindow.cpp" line="81"/>
+        <source>delta</source>
+        <translation type="unfinished">时间差</translation>
     </message>
 </context>
 </TS>

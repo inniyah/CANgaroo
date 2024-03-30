@@ -76,9 +76,9 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     ui->tree->setColumnWidth(BaseTraceViewModel::column_comment, 90);
     ui->tree->sortByColumn(BaseTraceViewModel::column_index, Qt::AscendingOrder);
 
-    ui->cbTimestampMode->addItem("absolute", 0);
-    ui->cbTimestampMode->addItem("relative", 1);
-    ui->cbTimestampMode->addItem("delta", 2);
+    ui->cbTimestampMode->addItem(tr("absolute"), 0);
+    ui->cbTimestampMode->addItem(tr("relative"), 1);
+    ui->cbTimestampMode->addItem(tr("delta"), 2);
     setTimestampMode(timestamp_mode_delta);
 
     connect(_linearTraceViewModel, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(rowsInserted(QModelIndex,int,int)));

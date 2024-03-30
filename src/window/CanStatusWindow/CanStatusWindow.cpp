@@ -38,9 +38,9 @@ CanStatusWindow::CanStatusWindow(QWidget *parent, Backend &backend) :
 {
     ui->setupUi(this);
     ui->treeWidget->setHeaderLabels(QStringList()
-        << "Driver" << "Interface" << "State"
-        << "Rx Frames" << "Rx Errors" << "Rx Overrun"
-        << "Tx Frames" << "Tx Errors" << "Tx Dropped"
+                                    << tr("Driver") << tr("Interface") << tr("State")
+                                    << tr("Rx Frames") << tr("Rx Errors") << tr("Rx Overrun")
+                                    << tr("Tx Frames") << tr("Tx Errors") << tr("Tx Dropped")
         // << "# Warning" << "# Passive" << "# Bus Off" << " #Restarts"
     );
     ui->treeWidget->setColumnWidth(0, 80);

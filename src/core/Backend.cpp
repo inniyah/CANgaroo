@@ -70,7 +70,7 @@ void Backend::addCanDriver(CanDriver &driver)
 
 bool Backend::startMeasurement()
 {
-    log_info("Starting measurement");
+    log_info(tr("Starting measurement"));
 
     _measurementStartTime = QDateTime::currentMSecsSinceEpoch();
     _timerSinceStart.start();
@@ -84,7 +84,7 @@ bool Backend::startMeasurement()
             if (intf) {
                 intf->applyConfig(*mi);
 
-                log_info(QString("Listening on interface: %1").arg(intf->getName()));
+                log_info(QString(tr("Listening on interface: %1")).arg(intf->getName()));
                 CanListener *listener = new CanListener(0, *this, *intf);
                 listener->startThread();
                 _listeners.append(listener);
@@ -105,14 +105,14 @@ bool Backend::stopMeasurement()
         }
 
         foreach (CanListener *listener, _listeners) {
-            log_info(QString("Closing interface: %1").arg(getInterfaceName(listener->getInterfaceId())));
+            log_info(QString(tr("Closing interface: %1")).arg(getInterfaceName(listener->getInterfaceId())));
             listener->waitFinish();
         }
 
         qDeleteAll(_listeners);
         _listeners.clear();
 
-        log_info("Measurement stopped");
+        log_info(tr("Measurement stopped"));
 
         _measurementRunning = false;
 
@@ -135,7 +135,7 @@ void Backend::loadDefaultSetup(MeasurementSetup &setup)
         driver->update();
         foreach (CanInterfaceId intf, driver->getInterfaceIds()) {
             MeasurementNetwork *network = setup.createNetwork();
-            network->setName(QString().asprintf("Network %d", i++));
+            network->setName(tr("Network ") + QString("%1").arg(i++));
 
             MeasurementInterface *mi = new MeasurementInterface();
             mi->setCanInterface(intf);

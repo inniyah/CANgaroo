@@ -49,27 +49,27 @@ QVariant BaseTraceViewModel::headerData(int section, Qt::Orientation orientation
         if (orientation == Qt::Horizontal) {
             switch (section) {
                 case column_index:
-                    return QString("Index");
+                return QString(tr("Index"));
                 case column_timestamp:
-                    return QString("Timestamp");
+                    return QString(tr("Timestamp"));
                 case column_channel:
-                    return QString("Channel");
+                    return QString(tr("Channel"));
                 case column_direction:
-                    return QString("Rx/Tx");
+                    return QString(tr("Rx/Tx"));
                 case column_type:
-                    return QString("Type");
+                    return QString(tr("Type"));
                 case column_canid:
                     return QString("CAN ID");
                 case column_sender:
-                    return QString("Sender");
+                    return QString(tr("Sender"));
                 case column_name:
-                    return QString("Name");
+                    return QString(tr("Name"));
                 case column_dlc:
                     return QString("DLC");
                 case column_data:
-                    return QString("Data");
+                    return QString(tr("Data"));
                 case column_comment:
-                    return QString("Comment");
+                    return QString(tr("Comment"));
             }
         }
 

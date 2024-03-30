@@ -281,7 +281,7 @@ void MainWindow::newWorkspace()
 void MainWindow::loadWorkspace()
 {
     if (askSaveBecauseWorkspaceModified() != QMessageBox::Cancel) {
-        QString filename = QFileDialog::getOpenFileName(this, "Open workspace configuration", "", "Workspace config files (*.cangaroo)");
+        QString filename = QFileDialog::getOpenFileName(this, tr("Open workspace configuration"), "", tr("Workspace config files (*.cangaroo)"));
         if (!filename.isNull()) {
             loadWorkspaceFromFile(filename);
         }
@@ -299,7 +299,7 @@ bool MainWindow::saveWorkspace()
 
 bool MainWindow::saveWorkspaceAs()
 {
-    QString filename = QFileDialog::getSaveFileName(this, "Save workspace configuration", "", "Workspace config files (*.cangaroo)");
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save workspace configuration"), "", tr("Workspace config files (*.cangaroo)"));
     if (!filename.isNull()) {
         return saveWorkspaceToFile(filename);
     } else {
@@ -326,10 +326,13 @@ int MainWindow::askSaveBecauseWorkspaceModified()
 {
     if (_workspaceModified) {
         QMessageBox msgBox;
-        msgBox.setText("The current workspace has been modified.");
-        msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setText(tr("The current workspace has been modified."));
+        msgBox.setInformativeText(tr("Do you want to save your changes?"));
         msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Save);
+        msgBox.setButtonText(QMessageBox::Save, QString(tr("Save")));
+        msgBox.setButtonText(QMessageBox::Discard, QString(tr("Discard")));
+        msgBox.setButtonText(QMessageBox::Cancel, QString(tr("Cancel")));
         int result = msgBox.exec();
 
         if (result == QMessageBox::Save) {
@@ -349,14 +352,16 @@ int MainWindow::askSaveBecauseWorkspaceModified()
 QMainWindow *MainWindow::createTraceWindow(QString title)
 {
     if (title.isNull()) {
-        title = "Trace";
+        title = tr("Trace");
     }
     QMainWindow *mm = createTab(title);
     mm->setCentralWidget(new TraceWindow(mm, backend()));
-    QDockWidget *dockStatusWidget = addStatusWidget(mm);
+
     QDockWidget *dockLogWidget = addLogWidget(mm);
+    QDockWidget *dockStatusWidget = addStatusWidget(mm);
     QDockWidget *dockRawTxWidget = addRawTxWidget(mm);
-    mm->splitDockWidget(dockLogWidget,dockRawTxWidget,Qt::Horizontal);
+
+    mm->splitDockWidget(dockRawTxWidget,dockLogWidget,Qt::Horizontal);
     mm->splitDockWidget(dockStatusWidget,dockLogWidget,Qt::Horizontal);
     mm->tabifyDockWidget(dockStatusWidget,dockLogWidget);
     ui->mainTabs->setCurrentWidget(mm);
@@ -366,7 +371,7 @@ QMainWindow *MainWindow::createTraceWindow(QString title)
 QMainWindow *MainWindow::createGraphWindow(QString title)
 {
     if (title.isNull()) {
-        title = "Graph";
+        title = tr("Graph");
     }
     QMainWindow *mm = createTab(title);
     mm->setCentralWidget(new GraphWindow(mm, backend()));
@@ -380,7 +385,7 @@ void MainWindow::addGraphWidget(QMainWindow *parent)
     if (!parent) {
         parent = currentTab();
     }
-    QDockWidget *dock = new QDockWidget("Graph", parent);
+    QDockWidget *dock = new QDockWidget(tr("Graph"), parent);
     dock->setWidget(new GraphWindow(dock, backend()));
     parent->addDockWidget(Qt::BottomDockWidgetArea, dock);
 }
@@ -390,7 +395,7 @@ QDockWidget *MainWindow::addRawTxWidget(QMainWindow *parent)
     if (!parent) {
         parent = currentTab();
     }
-    QDockWidget *dock = new QDockWidget("Transmit View", parent);
+    QDockWidget *dock = new QDockWidget(tr("Transmit View"), parent);
     dock->setWidget(new RawTxWindow(dock, backend()));
     parent->addDockWidget(Qt::BottomDockWidgetArea, dock);
     return dock;
@@ -402,7 +407,7 @@ QDockWidget *MainWindow::addLogWidget(QMainWindow *parent)
     if (!parent) {
         parent = currentTab();
     }
-    QDockWidget *dock = new QDockWidget("Log", parent);
+    QDockWidget *dock = new QDockWidget(tr("Log"), parent);
     dock->setWidget(new LogWindow(dock, backend()));
     parent->addDockWidget(Qt::BottomDockWidgetArea, dock);
     return dock;
@@ -413,8 +418,8 @@ QDockWidget *MainWindow::addStatusWidget(QMainWindow *parent)
     if (!parent) {
         parent = currentTab();
     }
-
-    QDockWidget *dock = new QDockWidget("CAN Status", parent);
+    
+    QDockWidget *dock = new QDockWidget(tr("CAN Status"), parent);
     dock->setWidget(new CanStatusWindow(dock, backend()));
     parent->addDockWidget(Qt::BottomDockWidgetArea, dock);
     return dock;
@@ -452,7 +457,7 @@ bool MainWindow::showSetupDialog()
 void MainWindow::showAboutDialog()
 {
     QMessageBox::about(this,
-       "About cangaroo",
+                       tr("About cangaroo"),
        "cangaroo\n"
        "open source can bus analyzer\n"
        "\n"
