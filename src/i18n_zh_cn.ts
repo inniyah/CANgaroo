@@ -145,7 +145,7 @@
     <message>
         <location filename="window/CanStatusWindow/CanStatusWindow.cpp" line="42"/>
         <source>Rx Frames</source>
-        <translation type="unfinished">接收帧</translation>
+        <translation type="unfinished">接收成功</translation>
     </message>
     <message>
         <location filename="window/CanStatusWindow/CanStatusWindow.cpp" line="42"/>
@@ -160,7 +160,7 @@
     <message>
         <location filename="window/CanStatusWindow/CanStatusWindow.cpp" line="43"/>
         <source>Tx Frames</source>
-        <translation type="unfinished">发送帧</translation>
+        <translation type="unfinished">发送成功</translation>
     </message>
     <message>
         <location filename="window/CanStatusWindow/CanStatusWindow.cpp" line="43"/>

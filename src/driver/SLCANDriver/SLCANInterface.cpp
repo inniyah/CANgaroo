@@ -431,8 +431,22 @@ void SLCANInterface::open()
     _serport->flush();
     _serport->waitForBytesWritten(300);
 
+    // Clear serial port receiver
+    if(_serport->waitForReadyRead(10))
+    {
+        qApp->processEvents();
+
+        if(_serport->bytesAvailable())
+        {
+            // This is called when readyRead() is emitted
+            _serport->readAll();
+        }
+    }
+
     _can_msg_queue.clear();
     _send_wait_respond = 0;
+    memset(_rxbuf,0,sizeof(_rxbuf));
+    memset(_rx_linbuf,0,sizeof(_rx_linbuf));
 
     _isOpen = true;
     _isOffline = false;
@@ -780,30 +794,34 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
         {
             _rx_linbuf[_rx_linbuf_ctr] = _rxbuf[_rxbuf_tail];
             _rx_linbuf_ctr++;
+            // std::cout << "result " << std::hex << int(_rxbuf[_rxbuf_tail]) << std::endl;
+            // std::cout << "_rxbuf_tail " << _rxbuf_tail << std::endl;
+            // std::cout << "_rxbuf_head " << _rxbuf_head << std::endl;
+            // std::cout << "_rx_linbuf_ctr " << _rx_linbuf_ctr << std::endl;
             // If we have a newline, then we just finished parsing a CAN message.
             if(_rxbuf[_rxbuf_tail] == '\r')
             {
-                CanMessage msg;
-                ret = parseMessage(msg);
-                if(ret == true)
+                if(_rx_linbuf_ctr > 1)
                 {
-                     msglist.append(msg);
-                    _status.rx_count ++;
+                    CanMessage msg;
+                    ret = parseMessage(msg);
+                    if(ret == true)
+                    {
+                         msglist.append(msg);
+                        _status.rx_count ++;
+                    }
                 }
                 else
                 {
-                    if(_rx_linbuf_ctr == 1)
+                    if(_send_wait_respond)
                     {
-                        if(_send_wait_respond)
+                        datetime = QDateTime::currentDateTime();
+                        if(datetime.toMSecsSinceEpoch() - _readMessage_datetime.toMSecsSinceEpoch() < 200)
                         {
-                            datetime = QDateTime::currentDateTime();
-                            if(datetime.toMSecsSinceEpoch() - _readMessage_datetime.toMSecsSinceEpoch() < 200)
-                            {
-                                _status.tx_count ++;
-                                _status.can_state = state_tx_success;
-                            }
-                            _send_wait_respond --;
+                            _status.tx_count ++;
+                            _status.can_state = state_tx_success;
                         }
+                        _send_wait_respond --;
                     }
                 }
                 _rx_linbuf_ctr = 0;
@@ -821,9 +839,9 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
                             _status.can_state = state_tx_fail;
                         }
                         _send_wait_respond --;
-                        _rx_linbuf_ctr = 0;
                     }
                 }
+                _rx_linbuf_ctr = 0;
             }
         }
         // Discard data if not
@@ -935,6 +953,9 @@ bool SLCANInterface::parseMessage(CanMessage &msg)
         // Invalid command
         default:
         {
+            // Reset buffer
+            _rx_linbuf_ctr = 0;
+            _rx_linbuf[0] = '\0';
             return false;
         }
     }
