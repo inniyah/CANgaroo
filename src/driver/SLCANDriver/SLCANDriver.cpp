@@ -95,8 +95,6 @@ QString SLCANDriver::getName() {
     return "SLCAN";
 }
 
-
-
 SLCANInterface *SLCANDriver::createOrUpdateInterface(int index, QString name, bool fd_support, uint32_t manufacturer) {
     foreach (CanInterface *intf, getInterfaces()) {
         SLCANInterface *scif = dynamic_cast<SLCANInterface*>(intf);

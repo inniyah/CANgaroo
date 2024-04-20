@@ -62,6 +62,12 @@ public:
 	uint8_t getLength() const;
 	void setLength(const uint8_t dlc);
 
+    bool isRX() const;
+    void setRX(const bool isRX);
+
+    bool isShow() const;
+    void setShow(const bool enable);
+
 	uint8_t getByte(const uint8_t index) const;
 	void setByte(const uint8_t index, const uint8_t value);
 
@@ -87,11 +93,14 @@ public:
     QString getIdString() const;
     QString getDataHexString() const;
 
+
 private:
 	uint32_t _raw_id;
     uint8_t _dlc;
     bool _isFD;
     bool _isBRS;
+    bool _isRX;
+    bool _isShow;
     CanInterfaceId _interface;
     union {
         uint8_t _u8[8*8];

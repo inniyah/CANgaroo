@@ -584,6 +584,13 @@ void RawTxWindow::reflash_can_msg()
     {
         _can_msg.setDataAt(i, data_int[i]);
     }
+
+    _can_msg.setRX(false);
+    _can_msg.setShow(ui->checkBox_Display_TX->isChecked());
+
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+    _can_msg.setTimestamp(tv);
 }
 
 void RawTxWindow::sendRawMessage()
@@ -596,6 +603,7 @@ void RawTxWindow::sendRawMessage()
         log_error(intf->getName() + " not Open!");
         return;
     }
+    _can_msg.setInterfaceId(intf->getId());
     intf->sendMessage(_can_msg);
 
     char outmsg[256];

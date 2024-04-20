@@ -542,7 +542,7 @@
     </message>
     <message>
         <location filename="mainwindow.ui" line="260"/>
-        <location filename="mainwindow.cpp" line="396"/>
+        <location filename="mainwindow.cpp" line="398"/>
         <source>Transmit View</source>
         <translation type="unfinished">发送视图</translation>
     </message>
@@ -593,23 +593,23 @@
         <translation type="unfinished">跟踪</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="372"/>
-        <location filename="mainwindow.cpp" line="386"/>
+        <location filename="mainwindow.cpp" line="374"/>
+        <location filename="mainwindow.cpp" line="388"/>
         <source>Graph</source>
         <translation type="unfinished">图表</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="408"/>
+        <location filename="mainwindow.cpp" line="410"/>
         <source>Log</source>
         <translation type="unfinished">日志</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="420"/>
+        <location filename="mainwindow.cpp" line="422"/>
         <source>CAN Status</source>
         <translation type="unfinished">CAN状态</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="458"/>
+        <location filename="mainwindow.cpp" line="460"/>
         <source>About cangaroo</source>
         <translation type="unfinished">关于cangaroo</translation>
     </message>
@@ -914,6 +914,11 @@
         <location filename="window/RawTxWindow/RawTxWindow.ui" line="1709"/>
         <source>48</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="window/RawTxWindow/RawTxWindow.ui" line="1866"/>
+        <source>Show TX frame</source>
+        <translation type="unfinished">显示发送帧</translation>
     </message>
 </context>
 <context>

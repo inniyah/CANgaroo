@@ -44,7 +44,7 @@ Backend::Backend()
     _logModel = new LogModel(*this);
 
     setDefaultSetup();
-    _trace = new CanTrace(*this, this, 100);
+    _trace = new CanTrace(*this, this, 1);
 
     connect(&_setup, SIGNAL(onSetupChanged()), this, SIGNAL(onSetupChanged()));
 }

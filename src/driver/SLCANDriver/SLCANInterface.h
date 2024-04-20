@@ -124,6 +124,7 @@ private:
     bool _isOffline;
     QSerialPort* _serport;
     QList<can_msg_t> _can_msg_queue;
+    QList<CanMessage> _can_msg_tx_queue;
     QMutex _serport_mutex;
     QString _name;
     char _rx_linbuf[SLCAN_MTU+1];

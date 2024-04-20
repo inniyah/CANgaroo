@@ -78,6 +78,7 @@ SLCANInterface::SLCANInterface(SLCANDriver *driver, int index, QString name, boo
     _readMessage_datetime_run = QDateTime::currentDateTime();
 
     _can_msg_queue.clear();
+    _can_msg_tx_queue.clear();
 }
 
 SLCANInterface::~SLCANInterface() {
@@ -444,6 +445,7 @@ void SLCANInterface::open()
     }
 
     _can_msg_queue.clear();
+    _can_msg_tx_queue.clear();
     _send_wait_respond = 0;
     memset(_rxbuf,0,sizeof(_rxbuf));
     memset(_rx_linbuf,0,sizeof(_rx_linbuf));
@@ -540,6 +542,7 @@ void SLCANInterface::close()
     }
 
     _can_msg_queue.clear();
+    _can_msg_tx_queue.clear();
 
     _serport_mutex.unlock();
 }
@@ -673,6 +676,7 @@ void SLCANInterface::sendMessage(const CanMessage &msg) {
     can_msg.length = msg_idx;
 
     _can_msg_queue.append(can_msg);
+    _can_msg_tx_queue.append(msg);
 
     _serport_mutex.unlock();
 
@@ -680,6 +684,7 @@ void SLCANInterface::sendMessage(const CanMessage &msg) {
 
 bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeout_ms)
 {
+    CanMessage msgtx;
     QDateTime datetime;
 
     datetime = QDateTime::currentDateTime();
@@ -733,11 +738,29 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
         {
             _send_wait_respond ++;
             _readMessage_datetime = QDateTime::currentDateTime();
+
+            // if(_can_msg_tx_queue.empty() == false)
+            // {
+            //     msgtx.cloneFrom(_can_msg_tx_queue.front());
+            //     if(_can_msg_tx_queue.empty() == false)
+            //         _can_msg_tx_queue.pop_front();
+            //     struct timeval tv;
+            //     gettimeofday(&tv,NULL);
+            //     msgtx.setTimestamp(tv);
+            //     _can_msg_tx_queue.push_front(msgtx);
+
+            // }
+
         }
         else
         {
             _status.tx_errors ++;
-            _send_wait_respond = 0;
+            //_send_wait_respond = 0;
+
+            if(_can_msg_tx_queue.empty() == false)
+            {
+                _can_msg_tx_queue.pop_front();
+            }
         }
 
         //_serport->flush();
@@ -822,7 +845,20 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
                             _status.can_state = state_tx_success;
                         }
                         _send_wait_respond --;
+
+                        if(_can_msg_tx_queue.empty() == false)
+                        {
+                            if(_status.can_state == state_tx_success)
+                            {
+                                msgtx.cloneFrom(_can_msg_tx_queue.front());
+                                if(msgtx.isShow())
+                                    msglist.append(msgtx);
+                            }
+                            if(_can_msg_tx_queue.empty() == false)
+                                _can_msg_tx_queue.pop_front();
+                        }
                     }
+
                 }
                 _rx_linbuf_ctr = 0;
             }
@@ -839,6 +875,9 @@ bool SLCANInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeou
                             _status.can_state = state_tx_fail;
                         }
                         _send_wait_respond --;
+
+                        if(_can_msg_tx_queue.empty() == false)
+                            _can_msg_tx_queue.pop_front();
                     }
                 }
                 _rx_linbuf_ctr = 0;
@@ -871,6 +910,7 @@ bool SLCANInterface::parseMessage(CanMessage &msg)
     msg.setRTR(false);
     msg.setFD(false);
     msg.setBRS(false);
+    msg.setRX(true);
 
     // Convert from ASCII (2nd character to end)
     for (int i = 1; i < _rx_linbuf_ctr; i++)
