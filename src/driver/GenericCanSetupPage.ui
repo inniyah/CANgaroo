@@ -275,19 +275,19 @@
     </rect>
    </property>
    <property name="inputMask">
-    <string>HHHH</string>
+    <string>HHHHHH</string>
    </property>
    <property name="text">
     <string notr="true"/>
    </property>
    <property name="maxLength">
-    <number>4</number>
+    <number>6</number>
    </property>
    <property name="frame">
     <bool>true</bool>
    </property>
    <property name="cursorPosition">
-    <number>4</number>
+    <number>6</number>
    </property>
    <property name="placeholderText">
     <string/>
@@ -304,12 +304,12 @@
     <rect>
      <x>330</x>
      <y>94</y>
-     <width>121</width>
+     <width>141</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Seg1+Seg2 (Hex)</string>
+    <string>Div+Seg1+Seg2 (Hex)</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_13">
@@ -317,12 +317,12 @@
     <rect>
      <x>330</x>
      <y>170</y>
-     <width>121</width>
+     <width>141</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Seg1+Seg2 (Hex)</string>
+    <string>Div+Seg1+Seg2 (Hex)</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="CustomFdBitrateSet">
@@ -338,19 +338,19 @@
     </rect>
    </property>
    <property name="inputMask">
-    <string>HHHH</string>
+    <string>HHHHHH</string>
    </property>
    <property name="text">
     <string notr="true"/>
    </property>
    <property name="maxLength">
-    <number>4</number>
+    <number>6</number>
    </property>
    <property name="frame">
     <bool>true</bool>
    </property>
    <property name="cursorPosition">
-    <number>4</number>
+    <number>6</number>
    </property>
    <property name="placeholderText">
     <string/>

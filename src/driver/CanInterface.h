@@ -86,6 +86,8 @@ public:
     virtual int getNumRxOverruns() = 0;
     virtual int getNumTxDropped() = 0;
 
+    virtual QString getVersion();
+
     QString getStateText();
 
     CanInterfaceId getId() const;

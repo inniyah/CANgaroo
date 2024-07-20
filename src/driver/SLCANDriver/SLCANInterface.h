@@ -109,6 +109,8 @@ public:
     virtual int getNumTxErrors();
     virtual int getNumTxDropped();
 
+    virtual QString getVersion();
+
     int getIfIndex();
 
 private:
@@ -119,6 +121,8 @@ private:
     } ts_mode_t;
 
     uint32_t _manufacturer;
+    QString _version;
+
     int _idx;
     bool _isOpen;
     bool _isOffline;

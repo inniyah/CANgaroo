@@ -62,6 +62,8 @@ void CanListener::run()
     QList<CanMessage> rxMessages;
     CanTrace *trace = _backend.getTrace();
     _intf.open();
+    qRegisterMetaType<log_level_t >("log_level_t");
+    log_info(QString(tr("interface: %1, Version: %2")).arg(_intf.getName(),_intf.getVersion()));
     _openComplete = true;
     while (_shouldBeRunning) {
         if (_intf.readMessage(rxMessages, 1000)) {
@@ -73,8 +75,7 @@ void CanListener::run()
         }
         else if(_intf.isOpen() == false)
         {
-            qRegisterMetaType<log_level_t >("log_level_t");
-            log_error(QString("Error on interface: %1, Closed!!!").arg(_intf.getName()));
+            log_error(QString(tr("Error on interface: %1, Closed!!!")).arg(_intf.getName()));
             rxMessages.clear();
             break;
 

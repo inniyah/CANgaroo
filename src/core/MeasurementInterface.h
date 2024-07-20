@@ -78,11 +78,11 @@ public:
     bool isCustomFdBitrate() const;
     void setCustomFdBitrateEn(bool customFdBitrate);
 
-    uint16_t customBitrate() const;
-    void setCustomBitrate(uint16_t customBitrate);
+    uint32_t customBitrate() const;
+    void setCustomBitrate(uint32_t customBitrate);
 
-    uint16_t customFdBitrate() const;
-    void setCustomFdBitrate(uint16_t customFdBitrate);
+    uint32_t customFdBitrate() const;
+    void setCustomFdBitrate(uint32_t customFdBitrate);
 private:
     CanInterfaceId _canif;
 
@@ -104,6 +104,6 @@ private:
     bool _isCustomBitrate;
     bool _isCustomFdBitrate;
 
-    uint16_t _CustomBitrate;
-    uint16_t _CustomFdBitrate;
+    uint32_t _CustomBitrate;
+    uint32_t _CustomFdBitrate;
 };

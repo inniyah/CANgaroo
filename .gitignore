@@ -37,3 +37,5 @@ Makefile*
 test.dbc
 
 .vscode/
+
+build/

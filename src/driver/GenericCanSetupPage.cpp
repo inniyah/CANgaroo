@@ -68,8 +68,8 @@ void GenericCanSetupPage::onShowInterfacePage(SetupDialog &dlg, MeasurementInter
     ui->cbCustomBitrate->setChecked(_mi->isCustomBitrate());
     ui->cbCustomFdBitrate->setChecked(_mi->isCustomFdBitrate());
 
-    ui->CustomBitrateSet->setText(QString::number( _mi->customBitrate(), 16 ).toUpper());
-    ui->CustomFdBitrateSet->setText(QString::number( _mi->customFdBitrate(), 16 ).toUpper());
+    ui->CustomBitrateSet->setText(QString("%1").arg(_mi->customBitrate(), 6, 16,QLatin1Char('0')).toUpper());
+    ui->CustomFdBitrateSet->setText(QString("%1").arg(_mi->customFdBitrate(), 6, 16,QLatin1Char('0')).toUpper());
 
     disenableUI(_mi->doConfigure());
     dlg.displayPage(this);
@@ -95,10 +95,112 @@ void GenericCanSetupPage::updateUI()
         _mi->setCustomBitrateEn(ui->cbCustomBitrate->isChecked());
         _mi->setCustomFdBitrateEn(ui->cbCustomFdBitrate->isChecked());
 
-        _mi->setCustomBitrate(ui->CustomBitrateSet->text().toUpper().toUInt(NULL, 16));
-        _mi->setCustomFdBitrate(ui->CustomFdBitrateSet->text().toUpper().toUInt(NULL, 16));
-
         _enable_ui_updates = false;
+
+        if(ui->cbCustomBitrate->isChecked())
+        {
+            if(ui->CustomBitrateSet->text().length() == 6)
+            {
+                uint8_t div,seg1,seg2;
+                uint32_t temp;
+                uint32_t CustomBitrateSet;
+                CustomBitrateSet = ui->CustomBitrateSet->text().toUpper().toUInt(NULL, 16);
+                div =  CustomBitrateSet >> 16;
+                seg1 = CustomBitrateSet >> 8;
+                seg2 = CustomBitrateSet & 0xff;
+
+                if(div == 0)
+                {
+                    div = 1;
+                }
+
+                if(seg1 < 2)
+                {
+                    seg1 = 2;
+                }
+
+                if(seg2 < 2)
+                {
+                    seg2 = 2;
+                }
+
+                if(seg2 > 128)
+                {
+                    seg2 = 128;
+                }
+                temp = div << 16;
+                CustomBitrateSet = temp;
+                temp = seg1 << 8;
+                CustomBitrateSet |= temp;
+                temp = seg2;
+                CustomBitrateSet |= temp;
+
+                _mi->setCustomBitrate(CustomBitrateSet);
+                ui->CustomBitrateSet->setText(QString("%1").arg(CustomBitrateSet, 6, 16,QLatin1Char('0')).toUpper());
+            }
+            else
+            {
+                _mi->setCustomBitrate(0x023407);
+            }
+        }
+
+        if(ui->cbCustomFdBitrate->isChecked())
+        {
+            if(ui->CustomFdBitrateSet->text().length() == 6)
+            {
+                uint8_t div,seg1,seg2;
+                uint32_t temp;
+                uint32_t CustomFdBitrateSet;
+                CustomFdBitrateSet = ui->CustomFdBitrateSet->text().toUpper().toUInt(NULL, 16);
+                div =  CustomFdBitrateSet >> 16;
+                seg1 = CustomFdBitrateSet >> 8;
+                seg2 = CustomFdBitrateSet & 0xff;
+
+                if(div == 0)
+                {
+                    div = 1;
+                }
+
+                if(seg1 == 0)
+                {
+                    seg1 = 1;
+                }
+
+                if(seg2 == 0)
+                {
+                    seg2 = 1;
+                }
+
+                if(div > 32)
+                {
+                    div = 32;
+                }
+
+                if(seg1 > 32)
+                {
+                    seg1 = 32;
+                }
+
+                if(seg2 > 16)
+                {
+                    seg2 = 16;
+                }
+
+                temp = div << 16;
+                CustomFdBitrateSet = temp;
+                temp = seg1 << 8;
+                CustomFdBitrateSet |= temp;
+                temp = seg2;
+                CustomFdBitrateSet |= temp;
+
+                _mi->setCustomFdBitrate(CustomFdBitrateSet);
+                ui->CustomFdBitrateSet->setText(QString("%1").arg(CustomFdBitrateSet, 6, 16,QLatin1Char('0')).toUpper());
+            }
+            else
+            {
+                _mi->setCustomFdBitrate(0x011508);
+            }
+        }
 
         disenableUI(_mi->doConfigure());
         fillSamplePointsForBitrate(

@@ -101,3 +101,8 @@ void CanInterface::setId(CanInterfaceId id)
 {
     _id = id;
 }
+
+QString CanInterface::getVersion()
+{
+    return "UnKnown";
+}

@@ -43,8 +43,8 @@ MeasurementInterface::MeasurementInterface()
     _isCustomBitrate(false),
     _isCustomFdBitrate(false),
 
-    _CustomBitrate(0x3407),
-    _CustomFdBitrate(0x1508)
+    _CustomBitrate(0x023407),
+    _CustomFdBitrate(0x011508)
 {
 
 }
@@ -250,22 +250,22 @@ void MeasurementInterface::setCustomFdBitrateEn(bool customFdBitrate)
     _isCustomFdBitrate = customFdBitrate;
 }
 
-uint16_t MeasurementInterface::customBitrate() const
+uint32_t MeasurementInterface::customBitrate() const
 {
     return _CustomBitrate;
 }
 
-void MeasurementInterface::setCustomBitrate(uint16_t customBitrate)
+void MeasurementInterface::setCustomBitrate(uint32_t customBitrate)
 {
     _CustomBitrate = customBitrate;
 }
 
-uint16_t MeasurementInterface::customFdBitrate() const
+uint32_t MeasurementInterface::customFdBitrate() const
 {
     return _CustomFdBitrate;
 }
 
-void MeasurementInterface::setCustomFdBitrate(uint16_t customFdBitrate)
+void MeasurementInterface::setCustomFdBitrate(uint32_t customFdBitrate)
 {
     _CustomFdBitrate = customFdBitrate;
 }

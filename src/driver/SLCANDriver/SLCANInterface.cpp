@@ -21,6 +21,7 @@
 
 #include "SLCANInterface.h"
 #include "qapplication.h"
+#include "qdebug.h"
 
 #include <core/Backend.h>
 #include <core/MeasurementInterface.h>
@@ -139,7 +140,7 @@ QList<CanTiming> SLCANInterface::getAvailableBitrates()
     }
     else if(_manufacturer == WeActStudio)
     {
-        bitrates.append({10000, 20000, 50000, 83333, 100000, 125000, 250000, 500000, 800000, 1000000});
+        bitrates.append({5000, 10000, 20000, 33333, 50000, 62500, 75000, 83333, 100000, 125000, 250000, 500000, 800000, 1000000});
         bitrates_fd.append({1000000, 2000000, 3000000, 4000000, 5000000});
         samplePoints.append({875});
         samplePoints_fd.append({750});
@@ -276,6 +277,11 @@ int SLCANInterface::getIfIndex() {
     return _idx;
 }
 
+QString SLCANInterface::getVersion()
+{
+    return _version;
+}
+
 void SLCANInterface::open()
 {
     if(_serport != NULL)
@@ -303,6 +309,7 @@ void SLCANInterface::open()
         perror("Serport connect failed!");
         _serport_mutex.unlock();
         _isOpen = false;
+        _isOffline = true;
         return;
     }
     _serport->flush();
@@ -312,10 +319,28 @@ void SLCANInterface::open()
     _serport->write("C\r", 2);
     _serport->flush();
     _serport->waitForBytesWritten(300);
+    _serport->waitForReadyRead(50);
+
+    // Get Version
+    _serport->clear(QSerialPort::Input);
+    _serport->write("V\r", 2);
+    _serport->flush();
+    _serport->waitForBytesWritten(300);
+    if(_serport->waitForReadyRead(50))
+    {
+        qApp->processEvents();
+
+        if(_serport->bytesAvailable())
+        {
+            // This is called when readyRead() is emitted
+            QByteArray datas = _serport->readLine();
+            _version = QString(datas).trimmed();
+        }
+    }
 
     if(_settings.isCustomBitrate())
     {
-        QString _custombitrate = QString::number( _settings.customBitrate(), 16 ).toUpper();
+        QString _custombitrate = QString("%1").arg(_settings.customBitrate(), 6, 16,QLatin1Char('0')).toUpper();
         std::string _custombitrate_std= 'S' + _custombitrate.toStdString() + '\r';
         _serport->write(_custombitrate_std.c_str(), _custombitrate_std.length());
         _serport->flush();
@@ -329,7 +354,7 @@ void SLCANInterface::open()
                 _serport->write("S8\r", 3);
                 _serport->flush();
                 break;
-            case 750000:
+            case 800000:
                 _serport->write("S7\r", 3);
                 _serport->flush();
                 break;
@@ -353,8 +378,20 @@ void SLCANInterface::open()
                 _serport->write("S9\r", 3);
                 _serport->flush();
                 break;
+            case 75000:
+                _serport->write("SA\r", 3);
+                _serport->flush();
+                break;
+            case 62500:
+                _serport->write("SB\r", 3);
+                _serport->flush();
+                break;
             case 50000:
                 _serport->write("S2\r", 3);
+                _serport->flush();
+                break;
+            case 33333:
+                _serport->write("SC\r", 3);
                 _serport->flush();
                 break;
             case 20000:
@@ -363,6 +400,10 @@ void SLCANInterface::open()
                 break;
             case 10000:
                 _serport->write("S0\r", 3);
+                _serport->flush();
+                break;
+            case 5000:
+                _serport->write("SD\r", 3);
                 _serport->flush();
                 break;
             default:
@@ -380,7 +421,7 @@ void SLCANInterface::open()
     {
         if(_settings.isCustomFdBitrate())
         {
-            QString _customfdbitrate = QString::number( _settings.customFdBitrate(), 16 ).toUpper();
+            QString _customfdbitrate = QString("%1").arg(_settings.customFdBitrate(), 6, 16,QLatin1Char('0')).toUpper();
             std::string _customfdbitrate_std= 'Y' + _customfdbitrate.toStdString() + '\r';
             _serport->write(_customfdbitrate_std.c_str(), _customfdbitrate_std.length());
             _serport->flush();

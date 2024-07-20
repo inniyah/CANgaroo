@@ -121,6 +121,19 @@
     </message>
 </context>
 <context>
+    <name>CanListener</name>
+    <message>
+        <location filename="driver/CanListener.cpp" line="66"/>
+        <source>interface: %1, Version: %2</source>
+        <translation type="unfinished">接口: %1, 版本: %2</translation>
+    </message>
+    <message>
+        <location filename="driver/CanListener.cpp" line="78"/>
+        <source>Error on interface: %1, Closed!!!</source>
+        <translation type="unfinished">接口错误: %1, 关闭!!!</translation>
+    </message>
+</context>
+<context>
     <name>CanStatusWindow</name>
     <message>
         <location filename="window/CanStatusWindow/CanStatusWindow.ui" line="14"/>
@@ -235,13 +248,15 @@
     <message>
         <location filename="driver/GenericCanSetupPage.ui" line="278"/>
         <location filename="driver/GenericCanSetupPage.ui" line="341"/>
-        <source>HHHH</source>
+        <source>HHHHHH</source>
+        <oldsource>HHHH</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="driver/GenericCanSetupPage.ui" line="312"/>
         <location filename="driver/GenericCanSetupPage.ui" line="325"/>
-        <source>Seg1+Seg2 (Hex)</source>
+        <source>Div+Seg1+Seg2 (Hex)</source>
+        <oldsource>Seg1+Seg2 (Hex)</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
