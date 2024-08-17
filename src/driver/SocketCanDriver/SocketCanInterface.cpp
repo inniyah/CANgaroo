@@ -356,7 +356,7 @@ void SocketCanInterface::open() {
 
 	struct ifreq ifr;
     struct sockaddr_can addr;
-    strcpy(ifr.ifr_name, _name.toStdString().c_str());
+    strlcpy(ifr.ifr_name, _name.toStdString().c_str(), IFNAMSIZ);
 	ioctl(_fd, SIOCGIFINDEX, &ifr);
 
 	addr.can_family  = AF_CAN;

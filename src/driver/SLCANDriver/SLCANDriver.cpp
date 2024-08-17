@@ -40,21 +40,32 @@ SLCANDriver::SLCANDriver(Backend &backend)
     QObject::connect(&backend, SIGNAL(onSetupDialogCreated(SetupDialog&)), setupPage, SLOT(onSetupDialogCreated(SetupDialog&)));
 }
 
-SLCANDriver::~SLCANDriver() {
+SLCANDriver::~SLCANDriver()
+{
 }
 
-bool SLCANDriver::update() {
-
+bool SLCANDriver::update()
+{
     deleteAllInterfaces();
 
     int interface_cnt = 0;
 
-    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
+    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
+    {
         // fprintf(stderr, "Name : %s \r\n",  info.portName().toStdString().c_str());
         // fprintf(stderr, "   Description : %s \r\n", info.description().toStdString().c_str());
         // fprintf(stderr, "   Manufacturer: %s \r\n", info.manufacturer().toStdString().c_str());
 
         if(info.vendorIdentifier() == 0xad50 && info.productIdentifier() == 0x60C4)
+        {
+            std::cout << "   ++ CANable 1.0 or similar ST USB CDC device detected" << std::endl;
+
+            // Create new slcan interface without FD support
+            _manufacturer = SLCANInterface::CANable;
+            createOrUpdateInterface(interface_cnt, info.portName(), false, _manufacturer);
+            interface_cnt++;
+        }
+        else if(info.vendorIdentifier() == 0x0403 && info.productIdentifier() == 0x6015)
         {
             std::cout << "   ++ CANable 1.0 or similar ST USB CDC device detected" << std::endl;
 
@@ -84,21 +95,25 @@ bool SLCANDriver::update() {
         }
         else
         {
-            std::cout << "   !! This is not a SLCAN device!" << std::endl;
+            //std::cout << "   !! This is not a SLCAN device!" << std::endl;
         }
     }
 
     return true;
 }
 
-QString SLCANDriver::getName() {
+QString SLCANDriver::getName()
+{
     return "SLCAN";
 }
 
-SLCANInterface *SLCANDriver::createOrUpdateInterface(int index, QString name, bool fd_support, uint32_t manufacturer) {
-    foreach (CanInterface *intf, getInterfaces()) {
+SLCANInterface *SLCANDriver::createOrUpdateInterface(int index, QString name, bool fd_support, uint32_t manufacturer)
+{
+    foreach (CanInterface *intf, getInterfaces())
+    {
         SLCANInterface *scif = dynamic_cast<SLCANInterface*>(intf);
-		if (scif->getIfIndex() == index) {
+        if (scif->getIfIndex() == index)
+        {
 			scif->setName(name);
             return scif;
 		}
@@ -106,5 +121,6 @@ SLCANInterface *SLCANDriver::createOrUpdateInterface(int index, QString name, bo
 
     SLCANInterface *scif = new SLCANInterface(this, index, name, fd_support, manufacturer);
     addInterface(scif);
+
     return scif;
 }

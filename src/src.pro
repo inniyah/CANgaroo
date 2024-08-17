@@ -1,4 +1,4 @@
-lessThan(QT_MAJOR_VERSION, 5): error("requires Qt 5")
+lessThan(QT_MAJOR_VERSION, 6): error("requires Qt 6")
 
 QT += core gui
 QT += widgets
@@ -11,7 +11,10 @@ TEMPLATE = app
 CONFIG += warn_on
 CONFIG += link_pkgconfig
 
-TRANSLATIONS = i18n_zh_cn.ts
+TRANSLATIONS = \
+    translations/cangaroo_de_DE.ts \
+    translations/i18n_en_us.ts \
+    translations/i18n_zh_cn.ts
 RC_ICONS = cangaroo.ico
 
 DESTDIR = ../bin

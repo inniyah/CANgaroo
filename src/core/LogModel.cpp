@@ -91,11 +91,11 @@ QVariant LogModel::headerData(int section, Qt::Orientation orientation, int role
     else if (role == Qt::TextAlignmentRole) {
         switch (section) {
         case column_time:
-            return Qt::AlignRight + Qt::AlignVCenter;
+            return static_cast<int>(Qt::AlignRight) + static_cast<int>(Qt::AlignVCenter);
         case column_level:
-            return Qt::AlignCenter + Qt::AlignVCenter;
+            return static_cast<int>(Qt::AlignCenter) + static_cast<int>(Qt::AlignVCenter);
         case column_text:
-            return Qt::AlignLeft + Qt::AlignVCenter;
+            return static_cast<int>(Qt::AlignLeft) + static_cast<int>(Qt::AlignVCenter);
         default:
             return QVariant();
         }
@@ -109,14 +109,14 @@ QVariant LogModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::TextAlignmentRole) {
         switch (index.column()) {
-            case column_time:
-                return Qt::AlignRight + Qt::AlignVCenter;
-            case column_level:
-                return Qt::AlignCenter + Qt::AlignVCenter;
-            case column_text:
-                return Qt::AlignLeft + Qt::AlignVCenter;
-            default:
-                return QVariant();
+        case column_time:
+            return static_cast<int>(Qt::AlignRight) + static_cast<int>(Qt::AlignVCenter);
+        case column_level:
+            return static_cast<int>(Qt::AlignCenter) + static_cast<int>(Qt::AlignVCenter);
+        case column_text:
+            return static_cast<int>(Qt::AlignLeft) + static_cast<int>(Qt::AlignVCenter);
+        default:
+            return QVariant();
         }
     }
 

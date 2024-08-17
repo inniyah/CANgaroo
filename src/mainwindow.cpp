@@ -27,6 +27,7 @@
 #include <QSignalMapper>
 #include <QCloseEvent>
 #include <QDomDocument>
+#include <QPalette>
 
 #include <core/MeasurementSetup.h>
 #include <core/CanTrace.h>
@@ -123,7 +124,7 @@ QMainWindow *MainWindow::createTab(QString title)
 {
     QMainWindow *mm = new QMainWindow(this);
     QPalette pal(palette());
-    pal.setColor(QPalette::Background, QColor(0xeb, 0xeb, 0xeb));
+    pal.setColor(QPalette::Window, QColor(0xeb, 0xeb, 0xeb));
     mm->setAutoFillBackground(true);
     mm->setPalette(pal);
     ui->mainTabs->addTab(mm, title);
@@ -330,21 +331,27 @@ int MainWindow::askSaveBecauseWorkspaceModified()
         msgBox.setInformativeText(tr("Do you want to save your changes?"));
         msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
         msgBox.setDefaultButton(QMessageBox::Save);
-        msgBox.setButtonText(QMessageBox::Save, QString(tr("Save")));
+        /*msgBox.setButtonText(QMessageBox::Save, QString(tr("Save")));
         msgBox.setButtonText(QMessageBox::Discard, QString(tr("Discard")));
-        msgBox.setButtonText(QMessageBox::Cancel, QString(tr("Cancel")));
+        msgBox.setButtonText(QMessageBox::Cancel, QString(tr("Cancel")));*/
         int result = msgBox.exec();
 
-        if (result == QMessageBox::Save) {
-            if (saveWorkspace()) {
+        if (result == QMessageBox::Save)
+        {
+            if (saveWorkspace())
+            {
                 return QMessageBox::Save;
-            } else {
+            }
+            else
+            {
                 return QMessageBox::Cancel;
             }
         }
 
         return result;
-    } else {
+    }
+    else
+    {
         return QMessageBox::Discard;
     }
 }
@@ -457,15 +464,16 @@ bool MainWindow::showSetupDialog()
 void MainWindow::showAboutDialog()
 {
     QMessageBox::about(this,
-                       tr("About cangaroo"),
-       "cangaroo\n"
-       "open source can bus analyzer\n"
+                       tr("About CANgaroo"),
+       "CANgaroo\n"
+       "Open Source CAN bus analyzer\n"
        "\n"
-       "version 0.2.4.1\n"
+       "version 0.3.0\n"
        "\n"
        "(c)2015-2017 Hubert Denkmair\n"
        "(c)2018-2022 Ethan Zonca\n"
-       "(c)2024 WeAct Studio"
+       "(c)2024 WeAct Studio\n"
+       "(c)2024 Schildkroet"
     );
 }
 

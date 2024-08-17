@@ -28,11 +28,15 @@
 #include <QDateTime>
 #include <driver/CanDriver.h>
 
-class CanMessage {
+
+class CanMessage
+{
 public:
 	CanMessage();
 	CanMessage(uint32_t can_id);
     CanMessage(const CanMessage &msg);
+    CanMessage& operator=(const CanMessage&) = default;
+
     void cloneFrom(const CanMessage &msg);
 
 	uint32_t getRawId() const;

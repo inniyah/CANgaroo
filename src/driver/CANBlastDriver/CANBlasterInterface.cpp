@@ -231,14 +231,17 @@ bool CANBlasterInterface::isOpen()
     return _isOpen;
 }
 
-void CANBlasterInterface::sendMessage(const CanMessage &msg) {
-
+void CANBlasterInterface::sendMessage(const CanMessage &msg)
+{
+    Q_UNUSED(msg);
 }
 
 bool CANBlasterInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeout_ms)
 {
     // Don't saturate the thread
     QThread().usleep(250);
+
+    Q_UNUSED(timeout_ms);
 
     // Record start time
     struct timeval now;

@@ -34,7 +34,7 @@ CanTrace::CanTrace(Backend &backend, QObject *parent, int flushInterval)
   : QObject(parent),
     _backend(backend),
     _isTimerRunning(false),
-    _mutex(QMutex::Recursive),
+    _mutex(),
     _timerMutex(),
     _flushTimer(this)
 {
@@ -118,7 +118,6 @@ void CanTrace::flushQueue()
         _newRows = 0;
         emit afterAppend();
     }
-
 }
 
 void CanTrace::startTimer()

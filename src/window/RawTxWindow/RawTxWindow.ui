@@ -115,7 +115,7 @@
     <rect>
      <x>10</x>
      <y>70</y>
-     <width>81</width>
+     <width>101</width>
      <height>17</height>
     </rect>
    </property>
@@ -126,7 +126,7 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>110</x>
      <y>70</y>
      <width>41</width>
      <height>17</height>
@@ -181,9 +181,9 @@
   <widget class="QComboBox" name="comboBoxInterface">
    <property name="geometry">
     <rect>
-     <x>80</x>
+     <x>90</x>
      <y>10</y>
-     <width>341</width>
+     <width>331</width>
      <height>25</height>
     </rect>
    </property>
@@ -191,9 +191,9 @@
   <widget class="QLabel" name="label_12">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>8</x>
      <y>10</y>
-     <width>61</width>
+     <width>71</width>
      <height>26</height>
     </rect>
    </property>
@@ -233,7 +233,7 @@
   <widget class="QComboBox" name="comboBoxDLC">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>100</x>
      <y>90</y>
      <width>51</width>
      <height>20</height>
@@ -1858,7 +1858,7 @@
     <rect>
      <x>10</x>
      <y>40</y>
-     <width>121</width>
+     <width>141</width>
      <height>23</height>
     </rect>
    </property>
