@@ -43,8 +43,10 @@ CanStatusWindow::CanStatusWindow(QWidget *parent, Backend &backend) :
                                     << tr("Tx Frames") << tr("Tx Errors") << tr("Tx Dropped")
         // << "# Warning" << "# Passive" << "# Bus Off" << " #Restarts"
     );
-    ui->treeWidget->setColumnWidth(0, 80);
-    ui->treeWidget->setColumnWidth(1, 70);
+    // Driver width
+    ui->treeWidget->setColumnWidth(0, 100);
+    // Interface width
+    ui->treeWidget->setColumnWidth(1, 110);
 
     connect(&backend, SIGNAL(beginMeasurement()), this, SLOT(beginMeasurement()));
     connect(&backend, SIGNAL(endMeasurement()), this, SLOT(endMeasurement()));

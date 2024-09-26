@@ -66,15 +66,15 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     ui->tree->setUniformRowHeights(true);
     ui->tree->setColumnWidth(BaseTraceViewModel::column_index, 70);
     ui->tree->setColumnWidth(BaseTraceViewModel::column_timestamp, 100);
-    ui->tree->setColumnWidth(BaseTraceViewModel::column_channel, 80);
+    ui->tree->setColumnWidth(BaseTraceViewModel::column_channel, 120);
     ui->tree->setColumnWidth(BaseTraceViewModel::column_direction, 50);
     ui->tree->setColumnWidth(BaseTraceViewModel::column_type, 80);
-    ui->tree->setColumnWidth(BaseTraceViewModel::column_canid, 80);
+    ui->tree->setColumnWidth(BaseTraceViewModel::column_canid, 110);
     ui->tree->setColumnWidth(BaseTraceViewModel::column_sender, 150);
     ui->tree->setColumnWidth(BaseTraceViewModel::column_name, 150);
     ui->tree->setColumnWidth(BaseTraceViewModel::column_dlc, 50);
     ui->tree->setColumnWidth(BaseTraceViewModel::column_data, 250);
-    ui->tree->setColumnWidth(BaseTraceViewModel::column_comment, 90);
+    ui->tree->setColumnWidth(BaseTraceViewModel::column_comment, 120);
     ui->tree->sortByColumn(BaseTraceViewModel::column_index, Qt::AscendingOrder);
 
     ui->cbTimestampMode->addItem(tr("Absolute"), 0);

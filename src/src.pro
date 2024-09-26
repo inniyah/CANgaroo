@@ -27,9 +27,9 @@ macx:OBJECTS_DIR = ../build/o/mac
 
 
 SOURCES += main.cpp\
-    mainwindow.cpp \
+    mainwindow.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui
 
@@ -44,6 +44,7 @@ include($$PWD/window/LogWindow/LogWindow.pri)
 include($$PWD/window/GraphWindow/GraphWindow.pri)
 include($$PWD/window/CanStatusWindow/CanStatusWindow.pri)
 include($$PWD/window/RawTxWindow/RawTxWindow.pri)
+include($$PWD/window/TxGeneratorWindow/TxGeneratorWindow.pri)
 
 
 unix:PKGCONFIG += libnl-3.0
@@ -52,5 +53,8 @@ unix:include($$PWD/driver/SocketCanDriver/SocketCanDriver.pri)
 
 include($$PWD/driver/CANBlastDriver/CANBlastDriver.pri)
 include($$PWD/driver/SLCANDriver/SLCANDriver.pri)
+include($$PWD/driver/GrIPDriver/GrIPDriver.pri)
 
 win32:include($$PWD/driver/CandleApiDriver/CandleApiDriver.pri)
+
+DISTFILES +=

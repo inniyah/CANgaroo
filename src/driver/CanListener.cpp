@@ -61,12 +61,15 @@ void CanListener::run()
     //CanMessage msg;
     QList<CanMessage> rxMessages;
     CanTrace *trace = _backend.getTrace();
+
     _intf.open();
+
     qRegisterMetaType<log_level_t >("log_level_t");
     log_info(QString(tr("interface: %1, Version: %2")).arg(_intf.getName(),_intf.getVersion()));
+
     _openComplete = true;
     while (_shouldBeRunning) {
-        if (_intf.readMessage(rxMessages, 1000)) {
+        if (_intf.readMessage(rxMessages, 500)) {
             for(const CanMessage &msg: qAsConst(rxMessages))
             {
                 trace->enqueueMessage(msg, false);

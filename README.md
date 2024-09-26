@@ -1,4 +1,4 @@
-# cangaroo
+# CANgaroo
 An open source can bus analyzer with support for transmit/receive of standard and FD frames and DBC decoding of incoming frames
 
 **Supported interfaces:**
@@ -8,21 +8,25 @@ An open source can bus analyzer with support for transmit/receive of standard an
 * Candlelight interfaces on Windows
 * Socketcan interfaces on Linux
 * [CANblaster](https://github.com/normaldotcom/canblaster) socketCAN over UDP server with auto-discovery
+* GrIP Driver
 
 ![demo1](https://user-images.githubusercontent.com/2422337/179544017-0deb66ab-e81d-4e6c-9d99-4059a14921c0.gif)
 
 
-written by Hubert Denkmair <hubert@denkmair.de>
+Written by Hubert Denkmair <hubert@denkmair.de>
 
-further development by Ethan Zonca <e@ethanzonca.com>
-
+Further development by:
+* Ethan Zonca <e@ethanzonca.com>
+* WeAct Studio
+* Schildkroet (https://github.com/Schildkroet/CANgaroo)
 
 
 ## Building on Linux
-* to install all required packages in a vanilla ubuntu 16.04:
+* to install all required packages in a vanilla ubuntu 24.04:
   * sudo apt-get install build-essential git qt5-qmake qtbase5-dev libnl-3-dev libnl-route-3-dev cmake qt5-default libqt5serialport5 libqt5serialport5-dev libqt5charts5 libqt5charts5-dev
+  * sudo apt install build-essential git qt6-base-dev libnl-3-dev libnl-route-3-dev cmake libgl1-mesa-dev
 * build with:
-  * qmake -qt=qt5
+  * qmake6
   * make
   * make install
 
@@ -40,8 +44,16 @@ further development by Ethan Zonca <e@ethanzonca.com>
   for a normal release build, these are: Qt5Core.dll Qt5Gui.dll Qt5Widgets.dll Qt5Xml.dll
 
 ## Changelog
+### v0.3.0
+* Migrate to Qt6
+* Added GrIP driver
 
-### v0.2.4 unreleased
+### v0.2.4.1
+* General bugfixes
+* Add WeAct Studio Support
+* Initial Translation support
+
+### v0.2.4
 * Add initial support for CANFD
 * Add support for SLCAN interfaces on Windows and Linux (CANable, CANable 2.0) including FD support
 * Add support for [CANblaster](https://github.com/normaldotcom/canblaster) socketCAN over UDP server with auto-discovery
@@ -81,7 +93,6 @@ further development by Ethan Zonca <e@ethanzonca.com>
 
 ### v0.1 released 2016-01-10
 initial release \o/
-
 
 
 ## TODO
@@ -133,7 +144,7 @@ initial release \o/
 
 ### packaging / deployment
 * provide clean debian package
-* gentoo ebuild script
+* Flatpak
 * provide static linked binary
 * add windows installer
 

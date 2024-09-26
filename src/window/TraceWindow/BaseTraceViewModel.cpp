@@ -55,7 +55,7 @@ QVariant BaseTraceViewModel::headerData(int section, Qt::Orientation orientation
                 case column_channel:
                     return QString(tr("Channel"));
                 case column_direction:
-                    return QString(tr("Rx/Tx"));
+                    return QString(tr("RX/TX"));
                 case column_type:
                     return QString(tr("Type"));
                 case column_canid:
@@ -197,11 +197,11 @@ QVariant BaseTraceViewModel::data_DisplayRole_Message(const QModelIndex &index, 
             return backend()->getInterfaceName(currentMsg.getInterfaceId());
 
         case column_direction:
-            return currentMsg.isRX()?"rx":"tx";
+            return currentMsg.isRX()?"RX":"TX";
 
         case column_type:
         {
-            QString _type = QString(currentMsg.isFD()? "Fd.":"") + QString(currentMsg.isExtended()? "Ext." : "Std.") + QString(currentMsg.isRTR()?"RTR":"") + QString((currentMsg.isBRS()?"BRS":""));
+            QString _type = QString(currentMsg.isFD()? "FD.":"") + QString(currentMsg.isExtended()? "EXT." : "STD.") + QString(currentMsg.isRTR()?"RTR":"") + QString((currentMsg.isBRS()?"BRS":""));
             return _type;
         }
 

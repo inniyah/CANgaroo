@@ -84,21 +84,32 @@
     <rect>
      <x>10</x>
      <y>90</y>
-     <width>72</width>
+     <width>81</width>
      <height>20</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Monospace</family>
+    </font>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
    </property>
    <property name="inputMask">
     <string>HHHHHHHH</string>
    </property>
    <property name="text">
-    <string notr="true">000</string>
+    <string notr="true">001</string>
    </property>
    <property name="frame">
     <bool>true</bool>
    </property>
    <property name="cursorPosition">
     <number>8</number>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
    <property name="placeholderText">
     <string/>
@@ -120,7 +131,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Address(hex)</string>
+    <string>Address(Hex)</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
@@ -233,7 +244,7 @@
   <widget class="QComboBox" name="comboBoxDLC">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>110</x>
      <y>90</y>
      <width>51</width>
      <height>20</height>
@@ -1863,7 +1874,20 @@
     </rect>
    </property>
    <property name="text">
-    <string>Show TX frame</string>
+    <string>Show TX Frames</string>
+   </property>
+  </widget>
+  <widget class="Line" name="line">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>170</y>
+     <width>141</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
    </property>
   </widget>
  </widget>

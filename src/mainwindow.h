@@ -60,6 +60,7 @@ public slots:
     QDockWidget *addRawTxWidget(QMainWindow *parent=0);
     QDockWidget *addLogWidget(QMainWindow *parent=0);
     QDockWidget *addStatusWidget(QMainWindow *parent=0);
+    QDockWidget *addTxGeneratorWidget(QMainWindow *parent=0);
 
     bool showSetupDialog();
     void showAboutDialog();
@@ -76,8 +77,8 @@ private slots:
     void on_action_WorkspaceSave_triggered();
     void on_action_WorkspaceSaveAs_triggered();
     void on_action_TraceClear_triggered();
-
     void on_actionCan_Status_View_triggered();
+    void on_actionGenerator_View_triggered();
 
 private:
     Ui::MainWindow *ui;

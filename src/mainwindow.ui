@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
+    <width>1365</width>
     <height>800</height>
    </rect>
   </property>
@@ -71,7 +71,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1200</width>
+     <width>1365</width>
      <height>25</height>
     </rect>
    </property>
@@ -101,6 +101,7 @@
      <addaction name="actionCan_Status_View"/>
      <addaction name="actionGraph_View_2"/>
      <addaction name="actionTransmit_View"/>
+     <addaction name="actionGenerator_View"/>
     </widget>
     <addaction name="menu_New"/>
    </widget>
@@ -258,6 +259,11 @@
   <action name="actionTransmit_View">
    <property name="text">
     <string>Transmit View</string>
+   </property>
+  </action>
+  <action name="actionGenerator_View">
+   <property name="text">
+    <string>Generator View</string>
    </property>
   </action>
  </widget>
