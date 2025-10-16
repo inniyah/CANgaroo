@@ -111,6 +111,13 @@ void TraceWindow::setMode(TraceWindow::mode_t mode)
     {
         ui->tree->setSortingEnabled(false);
         ui->tree->setModel(_linFilteredModel); //_linearTraceViewModel);
+        if (_timestampMode != timestamp_mode_delta) {
+            ui->tree->sortByColumn(BaseTraceViewModel::column_timestamp, Qt::AscendingOrder);
+        }
+        else {
+            ui->tree->sortByColumn(BaseTraceViewModel::column_canid, Qt::AscendingOrder);
+        }
+        ui->tree->sortByColumn(BaseTraceViewModel::column_canid, Qt::AscendingOrder);
         ui->cbAutoScroll->setEnabled(true);
         ui->tree->sortByColumn(BaseTraceViewModel::column_index, Qt::AscendingOrder);
     }
@@ -159,6 +166,14 @@ void TraceWindow::setTimestampMode(int mode)
     if (new_mode != _timestampMode)
     {
         _timestampMode = new_mode;
+
+        if (_mode==mode_linear && _timestampMode != timestamp_mode_delta) {
+            ui->tree->sortByColumn(BaseTraceViewModel::column_timestamp, Qt::AscendingOrder);
+        }
+        else {
+            ui->tree->sortByColumn(BaseTraceViewModel::column_canid, Qt::AscendingOrder);
+        }
+
         for (int i=0; i<ui->cbTimestampMode->count(); i++)
         {
             if (ui->cbTimestampMode->itemData(i).toInt() == new_mode)
@@ -166,6 +181,7 @@ void TraceWindow::setTimestampMode(int mode)
                 ui->cbTimestampMode->setCurrentIndex(i);
             }
         }
+
         emit(settingsChanged(this));
     }
 }
@@ -207,8 +223,8 @@ bool TraceWindow::loadXML(Backend &backend, QDomElement &el)
 
     QDomElement elAggregated = el.firstChildElement("AggregatedTraceView");
     int sortColumn = elAggregated.attribute("SortColumn", "-1").toInt();
-    ui->tree->sortByColumn(sortColumn,Qt::SortOrder::AscendingOrder);
-    //ui->tree->sortByColumn(sortColumn);
+    ui->tree->sortByColumn(sortColumn, Qt::SortOrder::AscendingOrder);
+    //~ ui->tree->sortByColumn(sortColumn);
 
     return true;
 }
