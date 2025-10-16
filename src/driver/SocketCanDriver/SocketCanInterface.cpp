@@ -455,6 +455,8 @@ bool SocketCanInterface::readMessage(QList<CanMessage> &msglist, unsigned int ti
         msg.setRTR((frame.can_id & CAN_RTR_FLAG)!=0);
         msg.setErrorFrame((frame.can_id & CAN_ERR_FLAG)!=0);
         msg.setInterfaceId(getId());
+        msg.setFD(false);
+        msg.setBRS(false);
 
         uint8_t len = frame.can_dlc;
         if (len>8) { len = 8; }

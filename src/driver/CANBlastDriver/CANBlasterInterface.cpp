@@ -39,7 +39,7 @@
 
 CANBlasterInterface::CANBlasterInterface(CANBlasterDriver *driver, int index, QString name, bool fd_support)
   : CanInterface((CanDriver *)driver),
-	_idx(index),
+    _idx(index),
     _isOpen(false),
     _name(name),
     _ts_mode(ts_mode_SIOCSHWTSTAMP),
@@ -294,6 +294,7 @@ bool CANBlasterInterface::readMessage(QList<CanMessage> &msglist, unsigned int t
             msg.setInterfaceId(getId());
             msg.setId(frame.can_id & CAN_ERR_MASK);
             msg.setBRS(false);
+            msg.setFD(false);
             msg.setErrorFrame(frame.can_id & CAN_ERR_FLAG);
             msg.setExtended(frame.can_id & CAN_EFF_FLAG);
             msg.setRTR(frame.can_id & CAN_RTR_FLAG);

@@ -312,6 +312,8 @@ bool CandleApiInterface::readMessage(QList<CanMessage> &msglist, unsigned int ti
             msg.setId(candle_frame_id(&frame));
             msg.setExtended(candle_frame_is_extended_id(&frame));
             msg.setRTR(candle_frame_is_rtr(&frame));
+            msg.setFD(false);
+            msg.setBRS(false);
 
             uint8_t dlc = candle_frame_dlc(&frame);
             uint8_t *data = candle_frame_data(&frame);
