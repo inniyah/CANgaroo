@@ -101,6 +101,8 @@ DbcParser::error_t DbcParser::tokenize(QFile *file, DbcParser::DbcTokenList &tok
     DbcToken *currentToken = 0;
     int line = 1;
     int column = 0;
+    QString s;
+    QChar ch;
 
     error_t retval = err_ok;
 
@@ -109,16 +111,29 @@ DbcParser::error_t DbcParser::tokenize(QFile *file, DbcParser::DbcTokenList &tok
     in.setEncoding(QStringEncoder::Latin1);
 
     while (true) {
-        QString s = in.read(1);
+        s = in.read(1);
         if (s.isEmpty()) { break; }
 
-        QChar ch = s[0];
+        ch = s[0];
 
         if (ch=='\n') {
             line++;
             column=1;
         } else {
             column++;
+        }
+
+        // handle escape of " - need to replace it to '
+        if(ch=='\\') {
+            s = in.read(1);
+            ch = s[0];
+            if(ch!='"') {
+                 retval = err_tokenize_error;
+                 _errorColumn = column;
+                 _errorLine = line;
+                 break;
+            }
+            ch = '\'';
         }
 
         if (currentToken) {
