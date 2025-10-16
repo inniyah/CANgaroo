@@ -43,7 +43,7 @@ Backend::Backend()
 {
     _logModel = new LogModel(*this);
 
-    setDefaultSetup();
+    //~ setDefaultSetup();
     _trace = new CanTrace(*this, this, 1);
 
     connect(&_setup, SIGNAL(onSetupChanged()), this, SIGNAL(onSetupChanged()));
@@ -75,9 +75,7 @@ bool Backend::startMeasurement()
     _measurementStartTime = QDateTime::currentMSecsSinceEpoch();
     _timerSinceStart.start();
 
-    int i=0;
     foreach (MeasurementNetwork *network, _setup.getNetworks()) {
-        i++;
         foreach (MeasurementInterface *mi, network->interfaces()) {
 
             CanInterface *intf = getInterfaceById(mi->canInterface());

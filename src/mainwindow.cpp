@@ -85,7 +85,7 @@ MainWindow::MainWindow(QWidget *parent) :
 #endif
     Backend::instance().addCanDriver(*(new SLCANDriver(Backend::instance())));
     Backend::instance().addCanDriver(*(new GrIPDriver(Backend::instance())));
-    // Backend::instance().addCanDriver(*(new CANBlasterDriver(Backend::instance())));
+    //~ Backend::instance().addCanDriver(*(new CANBlasterDriver(Backend::instance())));
 
     setWorkspaceModified(false);
     newWorkspace();
@@ -316,7 +316,7 @@ void MainWindow::newWorkspace()
         stopAndClearMeasurement();
         clearWorkspace();
         createTraceWindow();
-        backend().setDefaultSetup();
+        //~ backend().setDefaultSetup();
     }
 }
 
@@ -580,8 +580,8 @@ void MainWindow::saveTraceToFile()
 
     QFileDialog fileDialog(0, "Save Trace to file", QDir::currentPath(), filters);
     fileDialog.setAcceptMode(QFileDialog::AcceptSave);
-    fileDialog.setOption(QFileDialog::DontConfirmOverwrite,false);
-    //fileDialog.setConfirmOverwrite(true);
+    fileDialog.setOption(QFileDialog::DontConfirmOverwrite, false);
+    //~ fileDialog.setConfirmOverwrite(true);
     fileDialog.selectNameFilter(defaultFilter);
     fileDialog.setDefaultSuffix("asc");
     if (fileDialog.exec()) {

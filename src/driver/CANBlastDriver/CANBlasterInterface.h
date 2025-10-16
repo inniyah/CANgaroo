@@ -27,6 +27,7 @@
 #include <QTimer>
 
 class CANBlasterDriver;
+
 typedef struct {
     bool supports_canfd;
     bool supports_timing;

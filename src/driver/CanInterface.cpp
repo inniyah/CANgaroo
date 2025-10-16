@@ -80,14 +80,14 @@ bool CanInterface::updateStatistics()
 QString CanInterface::getStateText()
 {
     switch (getState()) {
-    case state_ok: return tr("ready");
-    case state_warning: return tr("warning");
-    case state_passive: return tr("error passive");
-    case state_bus_off: return tr("bus off");
-    case state_stopped: return tr("stopped");
-    case state_unknown: return tr("unknown");
-    case state_tx_success: return tr("tx success");
-    case state_tx_fail: return tr("tx fail");
+        case state_ok: return tr("ready");
+        case state_warning: return tr("warning");
+        case state_passive: return tr("error passive");
+        case state_bus_off: return tr("bus off");
+        case state_stopped: return tr("stopped");
+        case state_unknown: return tr("unknown");
+        case state_tx_success: return tr("tx success");
+        case state_tx_fail: return tr("tx fail");
         default: return "";
     }
 }

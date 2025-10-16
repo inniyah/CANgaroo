@@ -315,10 +315,11 @@ void SLCANInterface::open()
 
     if (_serport->open(QIODevice::ReadWrite))
     {
-        //perror("Serport connected!");
+        //~ perror("Serport connected!");
         qRegisterMetaType<QSerialPort::SerialPortError>("SerialThread");
-        //connect(_serport, static_cast<void (QSerialPort::*)(QSerialPort::SerialPortError)>(&QSerialPort::error),  this, &SLCANInterface::handleSerialError);
-        //connect(_serport, SIGNAL(readyRead()),this,SLOT(serport_readyRead()));
+        //~ connect(_serport, static_cast<void (QSerialPort::*)(QSerialPort::SerialPortError)>(&QSerialPort::error),  this, &SLCANInterface::handleSerialError);
+        connect(_serport, &QSerialPort::errorOccurred, this, &SLCANInterface::handleSerialError);
+        //~ connect(_serport, SIGNAL(readyRead()),this,SLOT(serport_readyRead()));
     }
     else
     {
@@ -544,18 +545,18 @@ void SLCANInterface::handleSerialError(QSerialPort::SerialPortError error)
     case QSerialPort::OpenError:
         ERRORString= "Open Error";
         break;
-    /*case QSerialPort::ParityError:
-        ERRORString= "Parity Error";
-        break;
-    case QSerialPort::FramingError:
-        ERRORString= "Framing Error";
-        break;
-    case QSerialPort::BreakConditionError:
-        ERRORString= "Break Condition";
-        break;
-    case QSerialPort::WriteError:
-        ERRORString= "Write Error";
-        break;*/
+    //~ case QSerialPort::ParityError:
+    //~     ERRORString= "Parity Error";
+    //~     break;
+    //~ case QSerialPort::FramingError:
+    //~     ERRORString= "Framing Error";
+    //~     break;
+    //~ case QSerialPort::BreakConditionError:
+    //~     ERRORString= "Break Condition";
+    //~     break;
+    //~ case QSerialPort::WriteError:
+    //~     ERRORString= "Write Error";
+    //~     break;
     case QSerialPort::ReadError:
         ERRORString= "Read Error";
         break;

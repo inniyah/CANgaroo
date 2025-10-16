@@ -97,9 +97,8 @@ public:
     QString getIdString() const;
     QString getDataHexString() const;
 
-
 private:
-	uint32_t _raw_id;
+    uint32_t _raw_id;
     uint8_t _dlc;
     bool _isFD;
     bool _isBRS;
@@ -111,7 +110,7 @@ private:
         uint16_t _u16[4*8];
         uint32_t _u32[2*8];
         uint64_t _u64[8];
-	};
+    };
     struct timeval _timestamp;
 
 };

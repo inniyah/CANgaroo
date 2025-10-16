@@ -107,7 +107,7 @@ DbcParser::error_t DbcParser::tokenize(QFile *file, DbcParser::DbcTokenList &tok
     error_t retval = err_ok;
 
     QTextStream in(file);
-    //in.setCodec("ISO 8859-1");
+    //~ in.setCodec("ISO 8859-1");
     in.setEncoding(QStringEncoder::Latin1);
 
     while (true) {
