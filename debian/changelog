@@ -1,3 +1,18 @@
+cangaroo (0.0.1+inertim1) UNRELEASED; urgency=medium
+
+  * Custom Release.
+  * Adapted to qt6
+
+ -- Miriam Ruiz <miriam@debian.org>  Fri, 17 Oct 2025 02:08:02 +0200
+
+cangaroo (0.2.4.1-0inertim1) UNRELEASED; urgency=medium
+
+  * New Upstream Release.
+  * Added Build Dependencies: pkg-config, libqt5charts5-dev, libqt5serialport5-dev,
+    libnl-3-dev, libnl-route-3-dev
+
+ -- Miriam Ruiz <miriam@debian.org>  Sat, 21 Sep 2024 21:48:10 +0200
+
 cangaroo (0.2.0-1) experimental; urgency=low
   * handle muxed signals in backend and trace window
   * can status window

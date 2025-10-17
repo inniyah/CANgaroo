@@ -1,6 +1,82 @@
 #!/usr/bin/make -f
-export QT_SELECT := qt5
+export QT_SELECT := qt6
 
-%:
-	dh $@ 
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
 
+CPPFLAGS:=$(shell dpkg-buildflags --get CPPFLAGS)
+CFLAGS:=$(shell dpkg-buildflags --get CFLAGS)
+CXXFLAGS:=$(shell dpkg-buildflags --get CXXFLAGS)
+LDFLAGS:=$(shell dpkg-buildflags --get LDFLAGS)
+LDFLAGS2:=-Wl,-z,defs  -Wl,-as-needed -Wl,--no-undefined
+
+# Check if qmake6 is available; if not, use qtmake
+QMAKE := $(shell command -v qmake6 >/dev/null 2>&1 && echo qmake6 || echo qtmake)
+
+config: config-stamp
+config-stamp: 
+	dh_testdir
+	[ ! -d debian/patches ] || $(MAKE) -f /usr/share/quilt/quilt.make patch
+	$(QMAKE) PREFIX=/usr
+	touch $@
+
+build-stamp: config
+	dh_testdir
+	$(MAKE) \
+		CFLAGS="$(CFLAGS) $(CPPFLAGS) -fPIC" \
+		CXXFLAGS="$(CXXFLAGS) $(CPPFLAGS) -fPIC" \
+		LDFLAGS="$(LDFLAGS) $(LDFLAGS2)"
+	touch $@
+
+build-indep: build-stamp
+
+build-arch: build-stamp
+
+build: build-arch build-indep
+
+clean: 
+	dh_testdir
+	dh_testroot
+	rm -fv build-stamp config-stamp
+	rm -fv .qmake.stash Makefile install SavvyCAN
+	find . -type f -name '*.o' -exec rm -fv {} \;
+	find . -type f -name 'ui_*.h' -exec rm -fv {} \;
+	find . -type f -name 'moc_*.h' -exec rm -fv {} \;
+	find . -type f -name 'moc_*.cpp' -exec rm -fv {} \;
+	find . -type f -name 'qrc_*.cpp' -exec rm -fv {} \;
+	[ ! -f Makefile ] || $(MAKE) clean
+	[ ! -d debian/patches ] || $(MAKE) -f /usr/share/quilt/quilt.make unpatch
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+	$(MAKE) INSTALL_ROOT=$(CURDIR)/debian/savvycan install
+
+# Build architecture-independent files here.
+binary-indep: install
+
+# Build architecture-dependent files here.
+binary-arch: install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+	dh_installexamples
+	dh_install
+	dh_installman
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	[ ! -e /usr/bin/dh_buildinfo ] || dh_buildinfo
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: config build-arch build-indep build clean binary-indep binary-arch binary install 

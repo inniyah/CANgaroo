@@ -1,6 +1,6 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: cangaroo
-Source: https://github.com/HubertD/cangaroo
+Source: https://github.com/WeActStudio/cangaroo
 
 Files: *
 Copyright: 2015-2016 Hubert Denkmair <hubert@denkmair.de>
