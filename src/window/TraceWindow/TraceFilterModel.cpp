@@ -34,12 +34,16 @@ bool TraceFilterModel::filterAcceptsRow(int source_row, const QModelIndex & sour
 
     //fprintf(stderr, "Data for acceptance is %s\r\n", datastr1.toStdString().c_str());
 
-    if( datastr0.contains(_filterText) ||
-        datastr1.contains(_filterText) ||
-        datastr2.contains(_filterText) ||
-        datastr3.contains(_filterText) ||
-        datastr4.contains(_filterText))
+    QRegularExpression _filterTextRE(_filterText);
+
+    if( datastr0.contains(_filterTextRE) ||
+        datastr1.contains(_filterTextRE) ||
+        datastr2.contains(_filterTextRE) ||
+        datastr3.contains(_filterTextRE) ||
+        datastr4.contains(_filterTextRE))
+
         return true;
+
     else
         return false;
 }
