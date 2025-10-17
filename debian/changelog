@@ -1,4 +1,4 @@
-cangaroo (0.0.1+inertim1) UNRELEASED; urgency=medium
+cangaroo (0.3.0~inertim1) UNRELEASED; urgency=medium
 
   * Custom Release.
   * Adapted to qt6
