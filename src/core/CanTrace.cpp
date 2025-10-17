@@ -136,15 +136,19 @@ void CanTrace::saveCanDump(QFile &file)
     for (unsigned int i=0; i<size(); i++) {
         CanMessage *msg = &_data[i];
         QString line;
-        line.append(QString().asprintf("(%.6f) ", msg->getFloatTimestamp()));
+        //~ line.append(QString().asprintf("(%.6f) ", msg->getFloatTimestamp()));
+        line.append(QString("(%1)").arg(msg->getFloatTimestamp(), 0, 'f', 6));
         line.append(_backend.getInterfaceName(msg->getInterfaceId()));
         if (msg->isExtended()) {
-            line.append(QString().asprintf(" %08X#", msg->getId()));
+            //~ line.append(QString().asprintf(" %08X#", msg->getId()));
+            line.append(QString(" %1").arg(msg->getId(), 8, 16, QChar('0')));
         } else {
-            line.append(QString().asprintf(" %03X#", msg->getId()));
+            //~ line.append(QString().asprintf(" %03X#", msg->getId()));
+            line.append(QString(" %1").arg(msg->getId(), 3, 16, QChar('0')));
         }
         for (int i=0; i<msg->getLength(); i++) {
-            line.append(QString().asprintf("%02X", msg->getByte(i)));
+            //~ line.append(QString().asprintf("%02X", msg->getByte(i)));
+            line.append(QString("%1").arg(msg->getByte(i), 2, 16, QChar('0')));
         }
         stream << line << Qt::endl;
     }
@@ -177,25 +181,25 @@ void CanTrace::saveVectorAsc(QFile &file)
         CanMessage &msg = _data[i];
 
         double t_current = msg.getFloatTimestamp();
-        QString id_hex_str = QString().asprintf("%x", msg.getId());
-        QString id_dec_str = QString().asprintf("%d", msg.getId());
+        //~ QString id_hex_str = QString().asprintf("%x", msg.getId());
+        QString id_hex_str = QString("%1").arg(msg.getId(), 0, 16);
+        //~ QString id_dec_str = QString().asprintf("%d", msg.getId());
+        QString id_dec_str = QString("%1").arg(msg.getId(), 0, 10);
         if (msg.isExtended()) {
             id_hex_str.append("x");
             id_dec_str.append("x");
         }
 
         // TODO how to handle RTR flag?
-        QString line = QString().asprintf(
-            "%11.6lf 1  %-15s %s   d %d %s  Length = %d BitCount = %d ID = %s",
-            t_current-t_start,
-            id_hex_str.toStdString().c_str(),
-            "Rx", // TODO handle Rx/Tx
-            msg.getLength(),
-            msg.getDataHexString().toStdString().c_str(),
-            0, // TODO Length (transfer time in ns)
-            0, // TODO BitCount (overall frame length, including stuff bits)
-            id_dec_str.toStdString().c_str()
-        );
+        QString line = QString("%1 1  %2 %3   d %4 %5  Length = %6 BitCount = %7 ID = %8")
+                           .arg(t_current - t_start, 11, 'f', 6)
+                           .arg(id_hex_str, -15)
+                           .arg("Rx")  // TODO handle Rx/Tx
+                           .arg(msg.getLength())
+                           .arg(msg.getDataHexString())
+                           .arg(0) // TODO Length (transfer time in ns)
+                           .arg(0) // TODO BitCount (overall frame length, including stuff bits)
+                           .arg(id_dec_str);
 
         stream << line << Qt::endl;
     }

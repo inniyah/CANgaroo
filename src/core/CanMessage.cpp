@@ -19,10 +19,10 @@
 
 */
 
-
-
 #include "CanMessage.h"
 #include <core/portable_endian.h>
+
+#include <QTextStream>
 
 enum {
 	id_flag_extended = 0x80000000,
@@ -345,9 +345,11 @@ QDateTime CanMessage::getDateTime() const
 QString CanMessage::getIdString() const
 {
     if (isExtended()) {
-        return QString().asprintf("0x%08X", getId());
+        //~ return QString().asprintf("0x%08X", getId());
+        return QString("0x%1").arg(getId(), 8, 16, QChar('0'));
     } else {
-        return QString().asprintf("0x%03X", getId());
+        //~ return QString().asprintf("0x%03X", getId());
+        return QString("0x%1").arg(getId(), 3, 16, QChar('0'));
     }
 }
 
