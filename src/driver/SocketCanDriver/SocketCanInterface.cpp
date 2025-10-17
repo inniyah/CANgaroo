@@ -237,7 +237,7 @@ bool SocketCanInterface::readConfig()
 bool SocketCanInterface::readConfigFromLink(rtnl_link *link)
 {
     _config.state = state_unknown;
-    _config.supports_canfd = (rtnl_link_get_mtu(link)==72);
+    _config.supports_canfd = (rtnl_link_get_mtu(link) >= CANFD_MTU);
     _config.supports_timing = rtnl_link_is_can(link);
     if (_config.supports_timing) {
         rtnl_link_can_freq(link, &_config.base_freq);
@@ -349,23 +349,36 @@ const char *SocketCanInterface::cname()
 }
 
 void SocketCanInterface::open() {
-	if((_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
-		perror("Error while opening socket");
+    if((_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
+        perror("Error while opening socket");
         _isOpen = false;
-	}
+        return;
+    }
 
-	struct ifreq ifr;
+    // Enable CAN-FD frames on this socket
+    int enable = 1;
+    if (setsockopt(_fd, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &enable, sizeof(enable)) < 0) {
+        perror("Error enabling CAN FD on socket");
+        // don't return; you can still work in classic CAN if the iface isn't FD
+    }
+
+    struct ifreq ifr;
     struct sockaddr_can addr;
     strlcpy(ifr.ifr_name, _name.toStdString().c_str(), IFNAMSIZ);
-	ioctl(_fd, SIOCGIFINDEX, &ifr);
-
-	addr.can_family  = AF_CAN;
-	addr.can_ifindex = ifr.ifr_ifindex;
-
-	if(bind(_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-		perror("Error in socket bind");
+    if (ioctl(_fd, SIOCGIFINDEX, &ifr) < 0) {
+        perror("SIOCGIFINDEX failed");
         _isOpen = false;
-	}
+        return;
+    }
+
+    addr.can_family  = AF_CAN;
+    addr.can_ifindex = ifr.ifr_ifindex;
+
+    if (bind(_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        perror("Error in socket bind");
+        _isOpen = false;
+        return;
+    }
 
     _isOpen = true;
 }
@@ -380,95 +393,142 @@ void SocketCanInterface::close() {
     _isOpen = false;
 }
 
+#include <linux/can.h>
+#include <linux/can/raw.h>
+
+// ...
 void SocketCanInterface::sendMessage(const CanMessage &msg) {
-	struct can_frame frame;
+    if (msg.isFD()) {
+        struct canfd_frame fdf;
+        memset(&fdf, 0, sizeof(fdf));
 
-	frame.can_id = msg.getId();
+        fdf.can_id = msg.getId();
+        if (msg.isExtended())    fdf.can_id |= CAN_EFF_FLAG;
+        if (msg.isRTR())         fdf.can_id |= CAN_RTR_FLAG;   // (rare with FD)
+        if (msg.isErrorFrame())  fdf.can_id |= CAN_ERR_FLAG;
 
-	if (msg.isExtended()) {
-		frame.can_id |= CAN_EFF_FLAG;
-	}
+        uint8_t len = msg.getLength();
+        if (len > CANFD_MAX_DLEN) len = CANFD_MAX_DLEN;
 
-	if (msg.isRTR()) {
-		frame.can_id |= CAN_RTR_FLAG;
-	}
+        fdf.len = len;                   // note: 'len' for FD, not can_dlc
+        if (msg.isBRS()) fdf.flags |= CANFD_BRS;  // bit-rate switching
+        // (ESI if you track it): if (msg.isESI()) fdf.flags |= CANFD_ESI;
 
-	if (msg.isErrorFrame()) {
-		frame.can_id |= CAN_ERR_FLAG;
-	}
+        for (int i = 0; i < len; ++i) fdf.data[i] = msg.getByte(i);
 
-	uint8_t len = msg.getLength();
-	if (len>8) { len = 8; }
+        ::write(_fd, &fdf, CANFD_MTU);
+        return;
+    }
 
-	frame.can_dlc = len;
-	for (int i=0; i<len; i++) {
-		frame.data[i] = msg.getByte(i);
-	}
+    // classic CAN fallback
+    struct can_frame cf;
+    memset(&cf, 0, sizeof(cf));
 
-	::write(_fd, &frame, sizeof(struct can_frame));
+    cf.can_id = msg.getId();
+    if (msg.isExtended())    cf.can_id |= CAN_EFF_FLAG;
+    if (msg.isRTR())         cf.can_id |= CAN_RTR_FLAG;
+    if (msg.isErrorFrame())  cf.can_id |= CAN_ERR_FLAG;
+
+    uint8_t len = msg.getLength();
+    if (len > CAN_MAX_DLEN) len = CAN_MAX_DLEN;
+
+    cf.can_dlc = len;
+    for (int i = 0; i < len; ++i) cf.data[i] = msg.getByte(i);
+
+    ::write(_fd, &cf, CAN_MTU);
 }
 
 bool SocketCanInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeout_ms) {
+    // Buffer large enough for an FD frame
+    alignas(struct canfd_frame) uint8_t buf[CANFD_MTU];
 
-    struct can_frame frame;
     struct timespec ts_rcv;
-    struct timeval tv_rcv;
-    struct timeval timeout;
-    //struct ifreq hwtstamp;
-    fd_set fdset;
+    struct timeval  tv_rcv;
+    struct timeval  timeout;
+    fd_set          fdset;
 
-    timeout.tv_sec = timeout_ms / 1000;
+    timeout.tv_sec  = timeout_ms / 1000;
     timeout.tv_usec = 1000 * (timeout_ms % 1000);
 
     FD_ZERO(&fdset);
     FD_SET(_fd, &fdset);
 
+    int rv = ::select(_fd + 1, &fdset, nullptr, nullptr, &timeout);
+    if (rv <= 0) {
+        // timeout or error -> behave like original and just return false
+        return false;
+    }
+
+    // Read up to CANFD_MTU; the size returned tells us the frame type
+    ssize_t n = ::read(_fd, buf, sizeof(buf));
+    if (n < 0) {
+        return false;
+    }
+
     CanMessage msg;
 
-    int rv = select(_fd+1, &fdset, NULL, NULL, &timeout);
-    if (rv>0) {
+    // Timestamping mode (same logic as original, just before decoding)
+    if (_ts_mode == ts_mode_SIOCSHWTSTAMP) {
+        // TODO: implement hardware timestamp config; fall back for now
+        _ts_mode = ts_mode_SIOCGSTAMPNS;
+    }
 
-        if (read(_fd, &frame, sizeof(struct can_frame)) < 0) {
-            return false;
+    if (_ts_mode == ts_mode_SIOCGSTAMPNS) {
+        if (::ioctl(_fd, SIOCGSTAMPNS, &ts_rcv) == 0) {
+            msg.setTimestamp(ts_rcv.tv_sec, ts_rcv.tv_nsec / 1000);
+        } else {
+            _ts_mode = ts_mode_SIOCGSTAMP;
         }
+    }
 
-        if (_ts_mode == ts_mode_SIOCSHWTSTAMP) {
-            // TODO implement me
-            _ts_mode = ts_mode_SIOCGSTAMPNS;
-        }
-
-        if (_ts_mode==ts_mode_SIOCGSTAMPNS) {
-            if (ioctl(_fd, SIOCGSTAMPNS, &ts_rcv) == 0) {
-                msg.setTimestamp(ts_rcv.tv_sec, ts_rcv.tv_nsec/1000);
-            } else {
-                _ts_mode = ts_mode_SIOCGSTAMP;
-            }
-        }
-
-        if (_ts_mode==ts_mode_SIOCGSTAMP) {
-            ioctl(_fd, SIOCGSTAMP, &tv_rcv);
+    if (_ts_mode == ts_mode_SIOCGSTAMP) {
+        if (::ioctl(_fd, SIOCGSTAMP, &tv_rcv) == 0) {
             msg.setTimestamp(tv_rcv.tv_sec, tv_rcv.tv_usec);
         }
+    }
 
-        msg.setId(frame.can_id);
-        msg.setExtended((frame.can_id & CAN_EFF_FLAG)!=0);
-        msg.setRTR((frame.can_id & CAN_RTR_FLAG)!=0);
-        msg.setErrorFrame((frame.can_id & CAN_ERR_FLAG)!=0);
+    // Decode classic vs FD by the read size
+    if (n == CAN_MTU) {
+        const struct can_frame *cf = reinterpret_cast<const struct can_frame *>(buf);
+
+        msg.setId(cf->can_id);
+        msg.setExtended((cf->can_id & CAN_EFF_FLAG) != 0);
+        msg.setRTR((cf->can_id & CAN_RTR_FLAG) != 0);
+        msg.setErrorFrame((cf->can_id & CAN_ERR_FLAG) != 0);
         msg.setInterfaceId(getId());
         msg.setFD(false);
         msg.setBRS(false);
 
-        uint8_t len = frame.can_dlc;
-        if (len>8) { len = 8; }
+        uint8_t len = cf->can_dlc;
+        if (len > CAN_MAX_DLEN) len = CAN_MAX_DLEN;
 
         msg.setLength(len);
-        for (int i=0; i<len; i++) {
-            msg.setByte(i, frame.data[i]);
+        for (int i = 0; i < static_cast<int>(len); ++i) {
+            msg.setByte(i, cf->data[i]);
         }
+    } else if (n == CANFD_MTU) {
+        const struct canfd_frame *fdf = reinterpret_cast<const struct canfd_frame *>(buf);
 
-	msglist.append(msg);
-        return true;
+        msg.setId(fdf->can_id);
+        msg.setExtended((fdf->can_id & CAN_EFF_FLAG) != 0);
+        msg.setRTR((fdf->can_id & CAN_RTR_FLAG) != 0);       // rarely used with FD
+        msg.setErrorFrame((fdf->can_id & CAN_ERR_FLAG) != 0);
+        msg.setInterfaceId(getId());
+        msg.setFD(true);
+        msg.setBRS((fdf->flags & CANFD_BRS) != 0);
+
+        uint8_t len = fdf->len;                               // note: 'len' is data length for FD
+        if (len > CANFD_MAX_DLEN) len = CANFD_MAX_DLEN;
+
+        msg.setLength(len);
+        for (int i = 0; i < static_cast<int>(len); ++i) {
+            msg.setByte(i, fdf->data[i]);
+        }
     } else {
+        // Unexpected size (e.g., not classic or FD). Ignore frame.
         return false;
     }
+
+    msglist.append(msg);
+    return true;
 }
